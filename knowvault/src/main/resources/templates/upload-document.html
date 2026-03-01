@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Document - KnowVault</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div class="navbar">
+    <h2>Upload Document</h2>
+</div>
+
+<div class="sidebar">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/documents/upload">Upload Document</a>
+    <a href="/documents">Documents</a>
+    <a href="/ai">Ask AI</a>
+    <a href="/history">History</a>
+</div>
+
+<div class="main-content">
+    <form action="/documents/upload" method="post" enctype="multipart/form-data">
+
+        <label>Title</label>
+        <input type="text" name="title" required>
+
+        <label>Description</label>
+        <textarea name="description"></textarea>
+
+        <label>Category</label>
+        <input type="text" name="category">
+
+        <label>Select PDF</label>
+        <input type="file" name="file" accept=".pdf" required>
+
+        <button type="submit">Upload</button>
+
+    </form>
+</div>
+
+</body>
+</html>
