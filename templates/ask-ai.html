@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ask AI - KnowVault</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div class="navbar">
+    Ask KnowVault AI
+</div>
+
+<div class="sidebar">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/documents/upload">Upload Document</a>
+    <a href="/documents">Documents</a>
+    <a href="/ai">Ask AI</a>
+    <a href="/history">History</a>
+</div>
+
+<div class="main-content">
+
+    <h2>Chat with KnowVault</h2>
+
+    <div class="chat-container">
+
+        <div class="message user">
+            What is the vacation policy?
+        </div>
+
+        <div class="message ai">
+            Employees are entitled to 15 days of paid vacation per year.
+            <small>Source: HR_Manual.pdf</small>
+        </div>
+
+    </div>
+
+    <form action="/ai/ask" method="post">
+        <input type="text" name="question" placeholder="Type your question here..." required>
+        <button type="submit">Send</button>
+    </form>
+
+</div>
+
+</body>
+</html>
