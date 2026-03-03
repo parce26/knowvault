@@ -5,8 +5,8 @@ Sistema de gestión de conocimiento empresarial con capacidades de IA para consu
 Equipo
 
 •	Kevin García Gutiérrez - Database Engineer
-•	Adrian Caldera Alfaro - Backend Developer  
-•	Sebastián González Tabares - Frontend
+•	Adrian Caldera Alfaro - Frontend  
+•	Sebastián González Tabares - Backend Developer
 
 
 Arquitectura de Base de Datos
@@ -273,3 +273,4 @@ Tareas Completadas
 
 Última actualización: 23 de febrero de 2026  
 Mantenido por: Kevin García Gutiérrez
+
