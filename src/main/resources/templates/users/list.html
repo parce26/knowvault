@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Usuarios</title>
+<meta charset="UTF-8" />
+<title>Users</title>
 </head>
 <body>
+<h1>Usuarios</h1>
 
-<h2>Lista de Usuarios</h2>
+<div th:if="${success}" th:text="${success}" style="color:green;"></div>
 
-<a href="/users/new">Nuevo Usuario</a>
+<p><a th:href="@{/users/new}">Crear usuario</a></p>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Email</th>
-        <th>Acciones</th>
-    </tr>
+<table border="1" cellpadding="6">
+<thead>
+<tr>
+    <th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Acciones</th>
+</tr>
+</thead>
+<tbody>
+<tr th:each="u : ${users}">
+    <td th:text="${u.userId}"></td>
+    <td th:text="${u.username}"></td>
+    <td th:text="${u.email}"></td>
+    <td th:text="${u.role}"></td>
+    <td>
+    <a th:href="@{/users/{id}/edit(id=${u.userId})}">Editar</a>
 
-    <tr th:each="user : ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.name}"></td>
-        <td th:text="${user.email}"></td>
-        <td>
-            <a th:href="@{/users/delete/{id}(id=${user.id})}">Eliminar</a>
-        </td>
-    </tr>
-
+    <form th:action="@{/users/{id}/delete(id=${u.userId})}" method="post" style="display:inline;">
+        <button type="submit" onclick="return confirm('¿Eliminar usuario?')">Eliminar</button>
+    </form>
+    </td>
+</tr>
+</tbody>
 </table>
 
 </body>

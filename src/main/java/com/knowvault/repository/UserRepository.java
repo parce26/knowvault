@@ -1,18 +1,16 @@
 package com.knowvault.repository;
 
-import java.util.List;
-
 import com.knowvault.model.User;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface UserRepository {
-
-    void save(User user);
-
     List<User> findAll();
-
-    User findById(Long id);
-
-    void update(User user);
-
-    void deleteById(Long id);
+    Optional<User> findById(int userId);
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+    int save(User user);          // retorna id creado
+    boolean update(User user);    // true si actualizó 1 fila
+    boolean deleteById(int userId);
 }
