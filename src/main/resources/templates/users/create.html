@@ -2,12 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
-<title>Crear User</title>
+<title>Create User</title>
 </head>
 <body>
-<h1>Crear usuario</h1>
 
-<form th:action="@{/users}" method="post" th:object="${form}">
+<h1>Create User</h1>
+
+<form th:action="@{/users/create}" method="post" th:object="${form}">
+
 <div>
     <label>Username</label>
     <input type="text" th:field="*{username}" />
@@ -26,17 +28,10 @@
     <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color:red;"></div>
 </div>
 
-<div>
-    <label>Role</label>
-    <select th:field="*{role}">
-    <option value="user">user</option>
-    <option value="admin">admin</option>
-    </select>
-    <div th:if="${#fields.hasErrors('role')}" th:errors="*{role}" style="color:red;"></div>
-</div>
+<button type="submit">Create</button>
 
-<button type="submit">Crear</button>
-<a th:href="@{/users}">Volver</a>
+<a th:href="@{/users}">Back</a>
+
 </form>
 
 </body>
