@@ -1,15 +1,20 @@
 package com.knowvault.controller;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.knowvault.model.User;
 import com.knowvault.model.dto.UserCreateForm;
 import com.knowvault.model.dto.UserUpdateForm;
 import com.knowvault.service.UserService;
+
 import jakarta.validation.Valid;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/users")
@@ -21,72 +26,96 @@ public class UserController {
         this.userService = userService;
     }
 
-    // LIST
+    // ==============================
+    // LIST USERS
+    // ==============================
+
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("users", userService.listUsers());
+    public String listUsers(Model model) {
+
+        model.addAttribute("users", userService.getAllUsers());
+
         return "users/list";
     }
 
-    // CREATE FORM
-    @GetMapping("/new")
-    public String createForm(Model model) {
+    // ==============================
+    // CREATE USER FORM
+    // ==============================
+
+    @GetMapping("/create")
+    public String createUserForm(Model model) {
+
         model.addAttribute("form", new UserCreateForm());
+
         return "users/create";
     }
 
-    // CREATE POST (PRG)
-    @PostMapping
-    public String create(@Valid @ModelAttribute("form") UserCreateForm form,
-                        BindingResult bindingResult,
-                        RedirectAttributes ra) {
-        if (bindingResult.hasErrors()) {
+    // ==============================
+    // CREATE USER
+    // ==============================
+
+    @PostMapping("/create")
+    public String createUser(@Valid @ModelAttribute("form") UserCreateForm form,
+                             BindingResult result) {
+
+        if (result.hasErrors()) {
             return "users/create";
         }
 
         userService.createUser(form);
-        ra.addFlashAttribute("success", "Usuario creado correctamente.");
+
         return "redirect:/users";
     }
 
-    // EDIT FORM
-    @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable("id") int id, Model model) {
-        User u = userService.getUserOrThrow(id);
+    // ==============================
+    // EDIT USER FORM
+    // ==============================
+
+    @GetMapping("/edit/{id}")
+    public String editUserForm(@PathVariable Long id, Model model) {
+
+        User user = userService.getUserById(id);
+
+        if (user == null) {
+            return "redirect:/users";
+        }
 
         UserUpdateForm form = new UserUpdateForm();
-        form.setUsername(u.getUsername());
-        form.setEmail(u.getEmail());
-        form.setRole(u.getRole());
-        form.setPassword(""); // vacío por defecto
+        form.setUserId(user.getUserId());
+        form.setUsername(user.getUsername());
+        form.setEmail(user.getEmail());
 
-        model.addAttribute("userId", id);
         model.addAttribute("form", form);
+
         return "users/edit";
     }
 
-    // UPDATE POST (PRG)
-    @PostMapping("/{id}")
-    public String update(@PathVariable("id") int id,
-                        @Valid @ModelAttribute("form") UserUpdateForm form,
-                        BindingResult bindingResult,
-                        Model model,
-                        RedirectAttributes ra) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("userId", id);
+    // ==============================
+    // UPDATE USER
+    // ==============================
+
+    @PostMapping("/edit")
+    public String updateUser(@Valid @ModelAttribute("form") UserUpdateForm form,
+                             BindingResult result) {
+
+        if (result.hasErrors()) {
             return "users/edit";
         }
 
-        userService.updateUser(id, form);
-        ra.addFlashAttribute("success", "Usuario actualizado correctamente.");
+        userService.updateUser(form);
+
         return "redirect:/users";
     }
 
-    // DELETE POST (PRG)
-    @PostMapping("/{id}/delete")
-    public String delete(@PathVariable("id") int id, RedirectAttributes ra) {
+    // ==============================
+    // DELETE USER
+    // ==============================
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable Long id) {
+
         userService.deleteUser(id);
-        ra.addFlashAttribute("success", "Usuario eliminado correctamente.");
+
         return "redirect:/users";
     }
 }

@@ -4,32 +4,74 @@ import java.time.LocalDateTime;
 
 public class User {
 
-    private Integer userId;          // user_id
-    private String username;         // username
-    private String email;            // email
-    private String passwordHash;     // password_hash
-    private String role;             // 'admin' | 'user'
-    private LocalDateTime createdAt; // created_at
-    private LocalDateTime updatedAt; // updated_at
+    private Long userId;
 
-    public Integer getUserId() { return userId; }
-    public void setUserId(Integer userId) { this.userId = userId; }
+    private String username;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    private String email;
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    private String passwordHash;
 
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+    private String role;
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    private LocalDateTime createdAt;
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    private LocalDateTime updatedAt;
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }
