@@ -1,93 +1,125 @@
 package com.knowvault.service;
 
-import com.knowvault.exception.DuplicateResourceException;
-import com.knowvault.exception.ResourceNotFoundException;
-import com.knowvault.model.User;
-import com.knowvault.model.dto.UserCreateForm;
-import com.knowvault.model.dto.UserUpdateForm;
-import com.knowvault.repository.UserRepository;
+import java.util.List;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.knowvault.model.User;
+import com.knowvault.model.dto.LoginForm;
+import com.knowvault.model.dto.UserCreateForm;
+import com.knowvault.model.dto.UserUpdateForm;
+import com.knowvault.repository.JdbcUserRepository;
 
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final BCryptPasswordEncoder encoder;
+    private final JdbcUserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder encoder) {
+    public UserService(JdbcUserRepository userRepository,
+                    BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.encoder = encoder;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> listUsers() {
+    // ==============================
+    // LOGIN
+    // ==============================
+
+    public User login(LoginForm form) {
+
+        User user = userRepository.findByEmail(form.getEmail());
+
+        if (user == null) {
+            return null;
+        }
+
+        boolean passwordMatches =
+                passwordEncoder.matches(form.getPassword(), user.getPasswordHash());
+
+        if (!passwordMatches) {
+            return null;
+        }
+
+        return user;
+    }
+
+
+    // ==============================
+    // CREATE USER
+    // ==============================
+
+    public void createUser(UserCreateForm form) {
+
+        if (userRepository.existsByEmail(form.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = new User();
+
+        user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail());
+
+        String hash = passwordEncoder.encode(form.getPassword());
+        user.setPasswordHash(hash);
+
+        user.setRole("USER");
+
+        userRepository.save(user);
+    }
+
+
+    // ==============================
+    // UPDATE USER
+    // ==============================
+
+    public void updateUser(UserUpdateForm form) {
+
+        User user = userRepository.findById(form.getUserId());
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail());
+
+        userRepository.update(user);
+    }
+
+
+    // ==============================
+    // DELETE USER
+    // ==============================
+
+    public void deleteUser(Long id) {
+
+        User user = userRepository.findById(id);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        userRepository.delete(id);
+    }
+
+
+    // ==============================
+    // GET ALL USERS
+    // ==============================
+
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public User getUserOrThrow(int userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + userId));
+
+    // ==============================
+    // GET USER BY ID
+    // ==============================
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id);
     }
 
-    public void createUser(UserCreateForm form) {
-        // Unicidad
-        userRepository.findByUsername(form.getUsername())
-                .ifPresent(u -> { throw new DuplicateResourceException("Username ya existe"); });
-
-        userRepository.findByEmail(form.getEmail())
-                .ifPresent(u -> { throw new DuplicateResourceException("Email ya existe"); });
-
-        User u = new User();
-        u.setUsername(form.getUsername().trim());
-        u.setEmail(form.getEmail().trim().toLowerCase());
-        u.setRole(form.getRole().trim());
-
-        String hash = encoder.encode(form.getPassword());
-        u.setPasswordHash(hash);
-
-        userRepository.save(u);
-    }
-
-    public void updateUser(int userId, UserUpdateForm form) {
-        User existing = getUserOrThrow(userId);
-
-        // Si cambian username/email, validar unicidad (excluyendo el mismo user)
-        userRepository.findByUsername(form.getUsername())
-                .ifPresent(u -> {
-                    if (!u.getUserId().equals(userId)) {
-                        throw new DuplicateResourceException("Username ya existe");
-                    }
-                });
-
-        userRepository.findByEmail(form.getEmail())
-                .ifPresent(u -> {
-                    if (!u.getUserId().equals(userId)) {
-                        throw new DuplicateResourceException("Email ya existe");
-                    }
-                });
-
-        existing.setUsername(form.getUsername().trim());
-        existing.setEmail(form.getEmail().trim().toLowerCase());
-        existing.setRole(form.getRole().trim());
-
-        // Password opcional
-        String newPassword = (form.getPassword() == null) ? "" : form.getPassword().trim();
-        if (!newPassword.isEmpty()) {
-            existing.setPasswordHash(encoder.encode(newPassword));
-        }
-
-        boolean ok = userRepository.update(existing);
-        if (!ok) {
-            throw new ResourceNotFoundException("No se pudo actualizar (id no existe): " + userId);
-        }
-    }
-
-    public void deleteUser(int userId) {
-        boolean ok = userRepository.deleteById(userId);
-        if (!ok) {
-            throw new ResourceNotFoundException("No se pudo eliminar (id no existe): " + userId);
-        }
-    }
 }
