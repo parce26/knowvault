@@ -18,6 +18,9 @@ public class UserCreateForm {
     @Size(min = 6, message = "Password must have at least 6 characters")
     private String password;
 
+    @NotBlank(message = "Role is required")
+    private String role;
+
 
     public String getUsername() {
         return username;
@@ -35,6 +38,7 @@ public class UserCreateForm {
         this.email = email;
     }
 
+
     public String getPassword() {
         return password;
     }
@@ -43,4 +47,12 @@ public class UserCreateForm {
         this.password = password;
     }
 
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }

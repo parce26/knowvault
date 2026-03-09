@@ -2,11 +2,12 @@ package com.knowvault.service;
 
 import java.util.List;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.knowvault.exception.DuplicateResourceException;
+import com.knowvault.exception.ResourceNotFoundException;
 import com.knowvault.model.User;
-import com.knowvault.model.dto.LoginForm;
 import com.knowvault.model.dto.UserCreateForm;
 import com.knowvault.model.dto.UserUpdateForm;
 import com.knowvault.repository.JdbcUserRepository;
@@ -15,111 +16,99 @@ import com.knowvault.repository.JdbcUserRepository;
 public class UserService {
 
     private final JdbcUserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(JdbcUserRepository userRepository,
-                    BCryptPasswordEncoder passwordEncoder) {
+    public UserService(JdbcUserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    // ==============================
-    // LOGIN
-    // ==============================
-
-    public User login(LoginForm form) {
-
-        User user = userRepository.findByEmail(form.getEmail());
-
-        if (user == null) {
-            return null;
-        }
-
-        boolean passwordMatches =
-                passwordEncoder.matches(form.getPassword(), user.getPasswordHash());
-
-        if (!passwordMatches) {
-            return null;
-        }
-
-        return user;
-    }
-
-
-    // ==============================
-    // CREATE USER
-    // ==============================
-
-    public void createUser(UserCreateForm form) {
-
-        if (userRepository.existsByEmail(form.getEmail())) {
-            throw new RuntimeException("Email already exists");
-        }
-
-        User user = new User();
-
-        user.setUsername(form.getUsername());
-        user.setEmail(form.getEmail());
-
-        String hash = passwordEncoder.encode(form.getPassword());
-        user.setPasswordHash(hash);
-
-        user.setRole("USER");
-
-        userRepository.save(user);
-    }
-
-
-    // ==============================
-    // UPDATE USER
-    // ==============================
-
-    public void updateUser(UserUpdateForm form) {
-
-        User user = userRepository.findById(form.getUserId());
-
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
-
-        user.setUsername(form.getUsername());
-        user.setEmail(form.getEmail());
-
-        userRepository.update(user);
-    }
-
-
-    // ==============================
-    // DELETE USER
-    // ==============================
-
-    public void deleteUser(Long id) {
-
-        User user = userRepository.findById(id);
-
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
-
-        userRepository.delete(id);
-    }
-
-
-    // ==============================
-    // GET ALL USERS
-    // ==============================
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
 
-    // ==============================
-    // GET USER BY ID
-    // ==============================
-
     public User getUserById(Long id) {
-        return userRepository.findById(id);
+
+        User user = userRepository.findById(id);
+
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        return user;
     }
 
+
+    public void createUser(UserCreateForm form) {
+
+        if (userRepository.existsByEmail(form.getEmail())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        if (userRepository.existsByUsername(form.getUsername())) {
+            throw new DuplicateResourceException("Username already exists");
+        }
+
+        String encodedPassword = passwordEncoder.encode(form.getPassword());
+
+        User user = new User();
+
+        user.setUsername(form.getUsername());
+        user.setEmail(form.getEmail());
+        user.setPasswordHash(encodedPassword);
+        user.setRole(form.getRole());
+
+        userRepository.save(user);
+    }
+
+
+    public void updateUser(Long id, UserUpdateForm form) {
+
+        User existing = userRepository.findById(id);
+
+        if (existing == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        if (!existing.getEmail().equals(form.getEmail()) &&
+                userRepository.existsByEmail(form.getEmail())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        existing.setUsername(form.getUsername());
+        existing.setEmail(form.getEmail());
+        existing.setRole(form.getRole());
+
+        userRepository.update(existing);
+    }
+
+
+    public void deleteUser(Long id) {
+
+        User user = userRepository.findById(id);
+
+        if (user == null) {
+            throw new ResourceNotFoundException("User not found");
+        }
+
+        userRepository.delete(id);
+    }
+
+
+    public User authenticate(String email, String password) {
+
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return null;
+        }
+
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            return null;
+        }
+
+        return user;
+    }
 }

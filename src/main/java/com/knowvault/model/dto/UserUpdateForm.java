@@ -16,6 +16,9 @@ public class UserUpdateForm {
     @Email(message = "Invalid email format")
     private String email;
 
+    @NotBlank(message = "Role is required")
+    private String role;
+
 
     public Long getUserId() {
         return userId;
@@ -25,6 +28,7 @@ public class UserUpdateForm {
         this.userId = userId;
     }
 
+
     public String getUsername() {
         return username;
     }
@@ -32,6 +36,7 @@ public class UserUpdateForm {
     public void setUsername(String username) {
         this.username = username;
     }
+
 
     public String getEmail() {
         return email;
@@ -41,4 +46,12 @@ public class UserUpdateForm {
         this.email = email;
     }
 
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }
