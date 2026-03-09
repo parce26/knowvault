@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.knowvault.model.User;
 import com.knowvault.model.dto.LoginForm;
+import com.knowvault.service.DocumentService;
 import com.knowvault.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -18,19 +19,21 @@ import jakarta.validation.Valid;
 public class ViewController {
 
     private final UserService userService;
+    private final DocumentService documentService;
 
-    public ViewController(UserService userService) {
+    public ViewController(
+            UserService userService,
+            DocumentService documentService
+    ) {
         this.userService = userService;
+        this.documentService = documentService;
     }
 
-    // ==============================
-    // LOGIN PAGE
-    // ==============================
-
-    @GetMapping("/")
-    public String root() {
-        return "redirect:/login";
-    }
+    /*
+    =========================================
+    LOGIN PAGE
+    =========================================
+     */
 
     @GetMapping("/login")
     public String loginPage(Model model) {
@@ -40,105 +43,46 @@ public class ViewController {
         return "auth/login";
     }
 
-    // ==============================
-    // LOGIN PROCESS
-    // ==============================
+    /*
+    =========================================
+    LOGIN PROCESS
+    =========================================
+     */
 
     @PostMapping("/login")
-    public String login(@Valid @ModelAttribute("form") LoginForm form,
-                        BindingResult result,
-                        HttpSession session,
-                        Model model) {
+    public String login(
+            @Valid @ModelAttribute("form") LoginForm form,
+            BindingResult bindingResult,
+            HttpSession session,
+            Model model
+    ) {
 
-        if (result.hasErrors()) {
-            return "login";
+        if (bindingResult.hasErrors()) {
+            return "auth/login";
         }
 
-        User user = userService.login(form);
+        User user = userService.authenticate(
+                form.getEmail(),
+                form.getPassword()
+        );
 
         if (user == null) {
+
             model.addAttribute("loginError", "Invalid email or password");
-            return "login";
+
+            return "auth/login";
         }
 
-        session.setAttribute("user", user);
+        session.setAttribute("loggedUser", user);
 
         return "redirect:/dashboard";
     }
 
-    // ==============================
-    // DASHBOARD
-    // ==============================
-
-    @GetMapping("/dashboard")
-    public String dashboard(HttpSession session) {
-
-        if (session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-
-        return "dashboard/index";
-    }
-
-    // ==============================
-    // DOCUMENTS PAGE
-    // ==============================
-
-    @GetMapping("/documents")
-    public String documents(HttpSession session) {
-
-        if (session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-
-        return "documents/list";
-    }
-
-    // ==============================
-    // UPLOAD PAGE
-    // ==============================
-
-    @GetMapping("/upload")
-    public String upload(HttpSession session) {
-
-        if (session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-
-        return "documents/upload";
-    }
-
-    // ==============================
-    // ASK AI PAGE
-    // ==============================
-
-    @GetMapping("/ask")
-    public String ask(HttpSession session) {
-
-        if (session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-
-        return "ai/ask";
-    }
-
-    // ==============================
-    // HISTORY PAGE
-    // ==============================
-
-    @GetMapping("/history")
-    public String history(HttpSession session) {
-
-        if (session.getAttribute("user") == null) {
-            return "redirect:/login";
-        }
-
-        return "history/list";
-    }
-
-    // ==============================
-    // LOGOUT
-    // ==============================
+    /*
+    =========================================
+    LOGOUT
+    =========================================
+     */
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
@@ -147,4 +91,107 @@ public class ViewController {
 
         return "redirect:/login";
     }
+
+    /*
+    =========================================
+    DASHBOARD
+    =========================================
+     */
+
+    @GetMapping("/dashboard")
+    public String dashboard(
+            HttpSession session,
+            Model model
+    ) {
+
+        if (!isLogged(session)) {
+            return "redirect:/login";
+        }
+
+        User user = (User) session.getAttribute("loggedUser");
+
+        model.addAttribute("user", user);
+
+        model.addAttribute(
+                "totalDocuments",
+                documentService.searchDocuments(null).size()
+        );
+
+        model.addAttribute(
+                "storageUsed",
+                documentService.formatStorageSize(
+                        documentService.getTotalStorageUsedBytes()
+                )
+        );
+
+        model.addAttribute(
+                "recentDocuments",
+                documentService.getRecentDocuments(5)
+        );
+
+        return "dashboard/index";
+    }
+
+
+
+    /*
+    =========================================
+    UPLOAD PAGE
+    =========================================
+     */
+
+    @GetMapping("/upload")
+    public String upload(HttpSession session) {
+
+        if (!isLogged(session)) {
+            return "redirect:/login";
+        }
+
+        return "documents/upload";
+    }
+
+    /*
+    =========================================
+    AI PAGE
+    =========================================
+     */
+
+    @GetMapping("/ask")
+    public String askAI(HttpSession session) {
+
+        if (!isLogged(session)) {
+            return "redirect:/login";
+        }
+
+        return "ai/ask";
+    }
+
+    /*
+    =========================================
+    HISTORY PAGE
+    =========================================
+     */
+
+    @GetMapping("/history")
+    public String history(HttpSession session) {
+
+        if (!isLogged(session)) {
+            return "redirect:/login";
+        }
+
+        return "history/list";
+    }
+
+    /*
+    =========================================
+    SESSION CHECK
+    =========================================
+     */
+
+    private boolean isLogged(HttpSession session) {
+
+        return session.getAttribute("loggedUser") != null;
+
+    }
+
 }

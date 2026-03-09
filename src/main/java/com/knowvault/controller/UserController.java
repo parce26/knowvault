@@ -26,9 +26,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // ==============================
-    // LIST USERS
-    // ==============================
 
     @GetMapping
     public String listUsers(Model model) {
@@ -38,27 +35,22 @@ public class UserController {
         return "users/list";
     }
 
-    // ==============================
-    // CREATE USER FORM
-    // ==============================
 
     @GetMapping("/create")
-    public String createUserForm(Model model) {
+    public String showCreateForm(Model model) {
 
         model.addAttribute("form", new UserCreateForm());
 
         return "users/create";
     }
 
-    // ==============================
-    // CREATE USER
-    // ==============================
 
-    @PostMapping("/create")
-    public String createUser(@Valid @ModelAttribute("form") UserCreateForm form,
-                             BindingResult result) {
+    @PostMapping
+    public String createUser(
+            @Valid @ModelAttribute("form") UserCreateForm form,
+            BindingResult bindingResult) {
 
-        if (result.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "users/create";
         }
 
@@ -67,51 +59,42 @@ public class UserController {
         return "redirect:/users";
     }
 
-    // ==============================
-    // EDIT USER FORM
-    // ==============================
 
     @GetMapping("/edit/{id}")
-    public String editUserForm(@PathVariable Long id, Model model) {
+    public String showEditForm(@PathVariable Long id, Model model) {
 
         User user = userService.getUserById(id);
 
-        if (user == null) {
-            return "redirect:/users";
-        }
-
         UserUpdateForm form = new UserUpdateForm();
+
         form.setUserId(user.getUserId());
         form.setUsername(user.getUsername());
         form.setEmail(user.getEmail());
+        form.setRole(user.getRole());
 
         model.addAttribute("form", form);
 
         return "users/edit";
     }
 
-    // ==============================
-    // UPDATE USER
-    // ==============================
 
-    @PostMapping("/edit")
-    public String updateUser(@Valid @ModelAttribute("form") UserUpdateForm form,
-                             BindingResult result) {
+    @PostMapping("/edit/{id}")
+    public String updateUser(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("form") UserUpdateForm form,
+            BindingResult bindingResult) {
 
-        if (result.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "users/edit";
         }
 
-        userService.updateUser(form);
+        userService.updateUser(id, form);
 
         return "redirect:/users";
     }
 
-    // ==============================
-    // DELETE USER
-    // ==============================
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
 
         userService.deleteUser(id);

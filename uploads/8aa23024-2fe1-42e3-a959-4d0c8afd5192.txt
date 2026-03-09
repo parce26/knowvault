@@ -1,0 +1,135 @@
+// ==================== Insumo.java ====================
+public class Insumo {
+    protected String codigo;
+    protected String descripcion;
+    protected double peso;
+
+    public Insumo(String codigo, String descripcion, double peso) {
+        this.codigo = codigo;
+        setDescripcion(descripcion);
+        setPeso(peso);
+    }
+
+    public void setPeso(double peso) {
+        if (peso > 0) {
+            this.peso = peso;
+        } else {
+            System.out.println("ERROR: El peso debe ser mayor a cero");
+            this.peso = 0;
+        }
+    }
+
+    public void setDescripcion(String descripcion) {
+        if (descripcion != null && !descripcion.trim().isEmpty()) {
+            this.descripcion = descripcion;
+        } else {
+            System.out.println("ERROR: La descripcion no puede ser nula");
+            this.descripcion = "Descripcion invalida";
+        }
+    }
+
+    public double calcularCostoTransporte() {
+        return peso * 2;
+    }
+}
+
+// ==================== InsumoRefrigerado.java ====================
+public class InsumoRefrigerado extends Insumo {
+    private double nivelRefrigeracion;
+
+    public InsumoRefrigerado(String codigo, String descripcion, double peso, double nivelRefrigeracion) {
+        super(codigo, descripcion, peso);
+        this.nivelRefrigeracion = nivelRefrigeracion;
+    }
+
+    @Override
+    public double calcularCostoTransporte() {
+        double costoBase = super.calcularCostoTransporte();
+        double recargo = nivelRefrigeracion * 5;
+        return costoBase + recargo;
+    }
+}
+
+// ==================== InsumoRiesgoso.java ====================
+public class InsumoRiesgoso extends Insumo {
+    private double indiceRiesgo;
+
+    public InsumoRiesgoso(String codigo, String descripcion, double peso, double indiceRiesgo) {
+        super(codigo, descripcion, peso);
+        this.indiceRiesgo = indiceRiesgo;
+    }
+
+    @Override
+    public double calcularCostoTransporte() {
+        double costoBase = super.calcularCostoTransporte();
+        double recargo = costoBase * indiceRiesgo;
+        return costoBase + recargo;
+    }
+}
+
+// ==================== PaqueteMedico.java ====================
+import java.util.ArrayList;
+
+public class PaqueteMedico {
+    private ArrayList<Insumo> lista = new ArrayList<>();
+
+    public void agregar(Insumo insumo) {
+        lista.add(insumo);
+    }
+
+    public double calcularCostoTotal() {
+        double total = 0;
+        for (Insumo i : lista) {
+            total += i.calcularCostoTransporte();
+        }
+        return total;
+    }
+
+    public double calcularPesoTotal() {
+        double total = 0;
+        for (Insumo i : lista) {
+            total += i.peso;
+        }
+        return total;
+    }
+}
+
+// ==================== DronMedico.java ====================
+public class DronMedico {
+    private double capacidad;
+    private boolean disponible = true;
+
+    public DronMedico(double capacidad) {
+        this.capacidad = capacidad;
+    }
+
+    public void procesarEnvio(PaqueteMedico paquete) {
+        if (paquete.calcularPesoTotal() > capacidad) {
+            System.out.println("No puede transportar el paquete");
+            return;
+        }
+        disponible = false;
+        System.out.println("Enviando paquete...");
+        System.out.println("Costo total: " + paquete.calcularCostoTotal());
+        disponible = true;
+        System.out.println("Entrega finalizada");
+    }
+}
+
+// ==================== Main.java ====================
+public class Main {
+    public static void main(String[] args) {
+        // El paquete tiene peso total de 15kg (10 + 5)
+        Insumo i1 = new InsumoRefrigerado("001", "Vacuna", 10, 2);
+        Insumo i2 = new InsumoRiesgoso("002", "Quimico", 5, 0.5);
+
+        PaqueteMedico paquete = new PaqueteMedico();
+        paquete.agregar(i1);
+        paquete.agregar(i2);
+
+        DronMedico drone1 = new DronMedico(20);
+        drone1.procesarEnvio(paquete);
+        DronMedico drone2 = new DronMedico(10);
+        drone2.procesarEnvio(paquete);
+    }
+}
