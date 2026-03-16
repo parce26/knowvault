@@ -1,14 +1,5 @@
 package com.knowvault.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.knowvault.model.DocumentChunk;
-import com.knowvault.repository.JdbcDocumentChunkRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -17,6 +8,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.knowvault.model.DocumentChunk;
+import com.knowvault.repository.JdbcDocumentChunkRepository;
 
 /**
  * AiService - Core RAG pipeline service.
@@ -34,7 +35,7 @@ public class AiService {
     private String apiKey;
 
     private static final String CLAUDE_API_URL = "https://api.anthropic.com/v1/messages";
-    private static final String CLAUDE_MODEL    = "claude-3-5-haiku-20241022";
+    private static final String CLAUDE_MODEL    = "claude-haiku-4-5-20251001";
     private static final int    MAX_CHUNKS      = 5;
 
     // Common words to ignore when extracting keywords
