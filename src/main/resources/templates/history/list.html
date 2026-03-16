@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,33 +13,33 @@
     <a href="/dashboard" class="logo-container">
         <img src="/images/logo.png" alt="KnowVault" class="logo-img">
     </a>
-    
+
     <div class="search-container">
-        <span class="search-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
-            </svg>
-        </span>
-        <input type="text" class="search-input" placeholder="Search documents..." id="searchInput">
+        <form th:action="@{/history}" method="get" style="display:flex; width:100%;">
+            <span class="search-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+            </span>
+            <input type="text"
+                   name="search"
+                   class="search-input"
+                   placeholder="Search history..."
+                   th:value="${search}">
+        </form>
     </div>
-    
+
     <div class="header-actions">
-        <button class="notification-btn">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-            </svg>
-            <span class="notification-badge"></span>
-        </button>
-        
         <div class="user-avatar-container">
             <div class="user-avatar" id="userAvatar">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white"/>
                     <path d="M12 14C6.47715 14 2 18.4772 2 24H22C22 18.4772 17.5228 14 12 14Z" fill="white" opacity="0.9"/>
                 </svg>
-                <input type="file" class="avatar-upload" id="avatarUpload" accept="image/*">
+                <span id="userInitials" th:text="${user != null ? user.username.substring(0,1).toUpperCase() : 'U'}">U</span>
             </div>
         </div>
+        <a href="/logout" class="btn-secondary" style="font-size:13px;">Logout</a>
     </div>
 </div>
 
@@ -54,7 +54,7 @@
             </span>
             <span>Home</span>
         </a>
-        
+
         <a href="/documents" class="nav-item">
             <span class="nav-icon">
                 <svg viewBox="0 0 20 20" fill="currentColor">
@@ -63,7 +63,7 @@
             </span>
             <span>My Documents</span>
         </a>
-        
+
         <a href="/history" class="nav-item active">
             <span class="nav-icon">
                 <svg viewBox="0 0 20 20" fill="currentColor">
@@ -72,18 +72,7 @@
             </span>
             <span>History</span>
         </a>
-    </nav>
-    
-    <div class="nav-section">
-        <div class="nav-section-title">Quick Actions</div>
-        <a href="/upload" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>Upload Document</span>
-        </a>
+
         <a href="/ask" class="nav-item">
             <span class="nav-icon">
                 <svg viewBox="0 0 20 20" fill="currentColor">
@@ -92,118 +81,172 @@
             </span>
             <span>Ask AI</span>
         </a>
+    </nav>
+
+    <div class="nav-section">
+        <div class="nav-section-title">Quick Actions</div>
+        <a href="/documents/upload" class="nav-item">
+            <span class="nav-icon">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                </svg>
+            </span>
+            <span>Upload Document</span>
+        </a>
     </div>
 </div>
 
-<!-- CONTENIDO PRINCIPAL -->
+<!-- MAIN CONTENT -->
 <div class="main-content">
-    
-    <!-- Encabezado -->
+
+    <!-- Page Header -->
     <div class="page-header">
-        <h1 class="page-title">Query History</h1>
-        <p class="page-subtitle">View your past AI conversations and searches</p>
+        <div>
+            <h1 class="page-title">Query History</h1>
+            <p class="page-subtitle">
+                <span th:text="${totalQueries}">0</span> total queries recorded
+            </p>
+        </div>
+
+        <!-- Clear all button — only show if there are entries -->
+        <form th:if="${historyEntries != null and !historyEntries.isEmpty()}"
+              th:action="@{/history/clear}"
+              method="post"
+              onsubmit="return confirm('Clear all history? This cannot be undone.');">
+            <button type="submit" class="btn-secondary" style="color: var(--danger); border-color: var(--danger);">
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                Clear All History
+            </button>
+        </form>
     </div>
 
-    <!-- Filtros -->
+    <!-- Search filter bar -->
     <div class="history-filters">
-        <div class="filter-group">
-            <input type="text" class="filter-input" placeholder="Search in history..." id="historySearch">
-        </div>
-        <div class="filter-group">
-            <select class="filter-select">
-                <option value="">All time</option>
-                <option value="today">Today</option>
-                <option value="week">This week</option>
-                <option value="month">This month</option>
-            </select>
-        </div>
-        <button class="btn-secondary" onclick="clearHistory()">
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-            Clear History
-        </button>
+        <form th:action="@{/history}" method="get" style="display:flex; gap: 12px; flex:1;">
+            <div class="filter-group" style="flex:1;">
+                <input type="text"
+                       name="search"
+                       class="filter-input"
+                       placeholder="Search in history..."
+                       th:value="${search}">
+            </div>
+            <button type="submit" class="btn-primary" style="padding: 8px 16px;">
+                Search
+            </button>
+            <a href="/history" class="btn-secondary" th:if="${search != null and !search.isBlank()}">
+                Clear
+            </a>
+        </form>
     </div>
 
-    <!-- Timeline de consultas -->
+    <!-- Content card -->
     <div class="content-card">
-        
-        <!-- Empty state (mostrar si no hay historial) -->
-        <div class="empty-history" id="emptyHistory">
-            <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor" style="opacity: 0.2; margin-bottom: 16px;">
+
+        <!-- EMPTY STATE: no entries at all -->
+        <div class="empty-history"
+             th:if="${historyEntries == null or historyEntries.isEmpty()}">
+            <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor"
+                 style="opacity: 0.2; margin-bottom: 16px;">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
             </svg>
-            <h3 style="margin-bottom: 8px; color: var(--gray-700);">No history yet</h3>
-            <p style="color: var(--gray-500); margin-bottom: 20px;">Your AI query history will appear here</p>
-            <button class="btn-primary" onclick="window.location.href='/ask'">
-                <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"/>
-                </svg>
-                Start Asking AI
-            </button>
+
+            <!-- Different messages: no results vs no history at all -->
+            <th:block th:if="${search != null and !search.isBlank()}">
+                <h3 style="margin-bottom: 8px; color: var(--gray-700);">No results found</h3>
+                <p style="color: var(--gray-500); margin-bottom: 20px;">
+                    No queries match "<span th:text="${search}"></span>"
+                </p>
+                <a href="/history" class="btn-secondary">View all history</a>
+            </th:block>
+
+            <th:block th:unless="${search != null and !search.isBlank()}">
+                <h3 style="margin-bottom: 8px; color: var(--gray-700);">No history yet</h3>
+                <p style="color: var(--gray-500); margin-bottom: 20px;">
+                    Your AI query history will appear here
+                </p>
+                <a href="/ask" class="btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"/>
+                    </svg>
+                    Start Asking AI
+                </a>
+            </th:block>
         </div>
 
-        <!-- Timeline (oculto por defecto, se muestra cuando hay datos) -->
-        <div class="history-timeline" id="historyTimeline" style="display: none;">
-            
-            <!-- Ejemplo de item de historial -->
-            <div class="history-item">
+        <!-- HISTORY TIMELINE: real entries from DB -->
+        <div class="history-timeline"
+             th:if="${historyEntries != null and !historyEntries.isEmpty()}">
+
+            <div class="history-item" th:each="entry : ${historyEntries}">
+
+                <!-- Date badge -->
                 <div class="history-date">
-                    <span class="history-day">26</span>
-                    <span class="history-month">Feb</span>
+                    <span class="history-day" th:text="${entry.displayDay}">01</span>
+                    <span class="history-month" th:text="${entry.displayMonth}">Jan</span>
                 </div>
+
+                <!-- Content -->
                 <div class="history-content">
-                    <div class="history-time">2:30 PM</div>
+                    <div class="history-time" th:text="${entry.displayTime}">00:00</div>
+
                     <div class="history-question">
-                        <strong>Q:</strong> What is the vacation policy for employees in Costa Rica?
+                        <strong>Q:</strong>
+                        <span th:text="${entry.queryText}">User question goes here</span>
                     </div>
+
                     <div class="history-answer">
-                        <strong>A:</strong> According to the employee handbook, employees in Costa Rica are entitled to 15 days of paid vacation per year...
+                        <strong>A:</strong>
+                        <span th:text="${entry.responsePreview}">AI response preview goes here...</span>
                     </div>
+
+                    <!-- Execution time badge (optional) -->
+                    <div th:if="${entry.executionTimeMs != null}"
+                         style="font-size: 12px; color: var(--gray-400); margin-bottom: 10px;">
+                        Response time: <span th:text="${entry.executionTimeMs}">0</span> ms
+                    </div>
+
+                    <!-- Actions -->
                     <div class="history-actions">
-                        <button class="history-action-btn">
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
-                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
-                            </svg>
-                            View Full
-                        </button>
-                        <button class="history-action-btn">
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z"/>
-                                <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/>
-                            </svg>
-                            Copy
-                        </button>
-                        <button class="history-action-btn history-delete-btn">
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
-                            Delete
-                        </button>
+                        <form th:action="@{/history/delete/{id}(id=${entry.queryId})}"
+                              method="post"
+                              onsubmit="return confirm('Delete this entry?');">
+                            <button type="submit"
+                                    class="history-action-btn history-delete-btn">
+                                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                Delete
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
 
         </div>
+        <!-- end history-timeline -->
 
     </div>
+    <!-- end content-card -->
 
 </div>
+<!-- end main-content -->
 
-<!-- BOTÓN FLOTANTE DE IA -->
-<button class="ai-fab" onclick="toggleAIChat()">AI</button>
+<!-- AI CHAT POPUP (placeholder, consistent with other pages) -->
+<button class="ai-chat-btn" onclick="toggleAIChat()">
+    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"/>
+    </svg>
+</button>
 
-<!-- POPUP DEL CHAT -->
 <div class="ai-chat-popup" id="aiChatPopup">
     <div class="chat-header">
-        <h3 class="chat-title">KnowVault Assist</h3>
-        <button class="chat-close" onclick="toggleAIChat()">×</button>
+        <span>KnowVault Assist</span>
+        <button onclick="toggleAIChat()" style="background:none;border:none;color:white;cursor:pointer;font-size:18px;">×</button>
     </div>
     <div class="chat-messages" id="chatMessages">
-        <div class="chat-message ai">
-            Hello! I'm KnowVault Assist. You can ask me questions about your documents.
-        </div>
+        <div class="chat-message ai">I'm KnowVault Assist. Ask me anything about your documents.</div>
     </div>
     <div class="chat-input-area">
         <div class="chat-input-wrapper">
@@ -213,77 +256,36 @@
     </div>
 </div>
 
-<!-- JAVASCRIPT -->
 <script>
-// AI Chat
-function toggleAIChat() {
-    document.getElementById('aiChatPopup').classList.toggle('active');
-}
-
-function sendMessage() {
-    const input = document.getElementById('chatInput');
-    const messagesContainer = document.getElementById('chatMessages');
-    
-    if (input.value.trim() === '') return;
-    
-    const userMessage = document.createElement('div');
-    userMessage.className = 'chat-message user';
-    userMessage.textContent = input.value;
-    messagesContainer.appendChild(userMessage);
-    
-    setTimeout(() => {
-        const aiMessage = document.createElement('div');
-        aiMessage.className = 'chat-message ai';
-        aiMessage.textContent = 'This is a placeholder response.';
-        messagesContainer.appendChild(aiMessage);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }, 500);
-    
-    input.value = '';
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-document.getElementById('chatInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') sendMessage();
-});
-
-// Clear history
-function clearHistory() {
-    if (confirm('Are you sure you want to clear all history? This action cannot be undone.')) {
-        // Aquí se implementaría la llamada al backend
-        alert('History cleared (this is a demo)');
+    function toggleAIChat() {
+        document.getElementById('aiChatPopup').classList.toggle('active');
     }
-}
 
-// Avatar
-document.getElementById('avatarUpload').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            const avatar = document.getElementById('userAvatar');
-            const initials = document.getElementById('userInitials');
-            initials.style.display = 'none';
-            const img = document.createElement('img');
-            img.src = event.target.result;
-            avatar.appendChild(img);
-            localStorage.setItem('userAvatar', event.target.result);
-        };
-        reader.readAsDataURL(file);
-    }
-});
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const container = document.getElementById('chatMessages');
+        if (!input.value.trim()) return;
 
-window.addEventListener('DOMContentLoaded', function() {
-    const savedAvatar = localStorage.getItem('userAvatar');
-    if (savedAvatar) {
-        const avatar = document.getElementById('userAvatar');
-        const initials = document.getElementById('userInitials');
-        initials.style.display = 'none';
-        const img = document.createElement('img');
-        img.src = savedAvatar;
-        avatar.appendChild(img);
+        const userMsg = document.createElement('div');
+        userMsg.className = 'chat-message user';
+        userMsg.textContent = input.value;
+        container.appendChild(userMsg);
+
+        setTimeout(() => {
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'chat-message ai';
+            aiMsg.textContent = 'Go to the Ask AI page for full AI queries.';
+            container.appendChild(aiMsg);
+            container.scrollTop = container.scrollHeight;
+        }, 400);
+
+        input.value = '';
+        container.scrollTop = container.scrollHeight;
     }
-});
+
+    document.getElementById('chatInput').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') sendMessage();
+    });
 </script>
 
 </body>
