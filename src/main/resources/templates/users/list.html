@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<meta charset="UTF-8">
+<title>Users</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f5f6fa;
+    margin:0;
+}
+
+.container{
+    padding:30px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+h1{
+    font-size:24px;
+}
+
+.btn-primary{
+    background:#2563eb;
+    color:white;
+    padding:10px 18px;
+    border-radius:6px;
+    text-decoration:none;
+}
+
+.btn-primary:hover{
+    background:#1e4fd6;
+}
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    text-align:left;
+    padding:12px;
+    color:#555;
+    border-bottom:1px solid #eee;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #f0f0f0;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+}
+
+.btn-edit{
+    background:#3b82f6;
+    color:white;
+    padding:6px 10px;
+    border-radius:4px;
+    text-decoration:none;
+}
+
+.btn-delete{
+    background:#ef4444;
+    color:white;
+    padding:6px 10px;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<h1>Users</h1>
+
+<a class="btn-primary" th:href="@{/users/create}">
+Create User
+</a>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+<tr>
+<th>Username</th>
+<th>Email</th>
+<th>Role</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr th:each="user : ${users}">
+
+<td th:text="${user.username}"></td>
+<td th:text="${user.email}"></td>
+<td th:text="${user.role}"></td>
+
+<td class="actions">
+
+<a class="btn-edit"
+   th:href="@{'/users/edit/' + ${user.userId}}">
+Edit
+</a>
+
+<form th:action="@{'/users/delete/' + ${user.userId}}"
+      method="post">
+
+<button class="btn-delete">
+Delete
+</button>
+
+</form>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</body>
+</html>
