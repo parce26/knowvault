@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnowVault - My Documents</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<!-- HEADER / SIDEBAR remain exactly like your design -->
+<!-- Only dynamic section below was upgraded -->
+
+<div class="main-content">
+
+<div class="page-header">
+<div>
+<h1 class="page-title">My Documents</h1>
+<p class="page-subtitle">Manage your knowledge base documents</p>
+</div>
+
+<a class="btn-primary" th:href="@{/documents/upload}">
+Upload Document
+</a>
+</div>
+
+<!-- EMPTY STATE -->
+<div class="empty-documents"
+     th:if="${#lists.isEmpty(documents)}">
+
+<h3>No documents yet</h3>
+<p>Upload your first document to get started</p>
+
+<a class="btn-primary"
+   th:href="@{/documents/upload}">
+Upload Document
+</a>
+
+</div>
+
+
+<!-- DOCUMENT GRID -->
+<div class="documents-grid"
+     th:if="${!#lists.isEmpty(documents)}">
+
+<div class="document-card"
+     th:each="doc : ${documents}">
+
+<div class="document-icon">
+📄
+</div>
+
+<div class="document-info">
+
+<h3 class="document-title"
+    th:text="${doc.title}"></h3>
+
+<div class="document-meta">
+
+<span class="document-category"
+      th:text="${doc.category}"></span>
+
+<span class="document-size"
+th:text="${#numbers.formatDecimal(doc.fileSize/1024.0/1024.0,1,2)} + ' MB'"></span>
+
+<span class="document-date"
+th:text="${#temporals.format(doc.uploadDate,'MMM d, yyyy')}"></span>
+
+</div>
+
+</div>
+
+<div class="document-actions">
+
+<a class="doc-action-btn"
+   th:href="@{'/documents/download/' + ${doc.documentId}}">
+Download
+</a>
+
+<form th:action="@{'/documents/delete/' + ${doc.documentId}}"
+      method="post"
+      onsubmit="return confirm('Delete this document?')">
+
+<button class="doc-action-btn doc-delete-btn">
+Delete
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
