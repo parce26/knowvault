@@ -1,27 +1,20 @@
 package com.knowvault.model;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * QueryHistory - Represents a single AI query record in the system.
- * Maps directly to the query_history table in the database.
+ * QueryHistory - Entity representing an AI query interaction.
+ * Extends BaseEntity to inherit common fields (id, createdAt, updatedAt).
  *
- * @author Kevin García Gutiérrez
+ * @author Sebastián González Tabares
  */
-public class QueryHistory {
+public class QueryHistory extends BaseEntity {
 
-    // ==============================
-    // Fields
-    // ==============================
-
-    private Long queryId;
     private Long userId;
     private String queryText;
     private String responseText;
-    private String documentsUsed;   // stored as JSON string in DB
+    private String documentsUsed;
     private Integer executionTimeMs;
-    private LocalDateTime createdAt;
 
     // ==============================
     // Constructors
@@ -39,36 +32,42 @@ public class QueryHistory {
     }
 
     // ==============================
-    // Helper methods
+    // Implement abstract method
     // ==============================
 
-    /**
-     * Returns the day-of-month for display in the timeline (e.g., "26").
-     */
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    // Alias for compatibility
+    public Long getQueryId() {
+        return id;
+    }
+
+    public void setQueryId(Long queryId) {
+        this.id = queryId;
+    }
+
+    // ==============================
+    // Display helper methods
+    // ==============================
+
     public String getDisplayDay() {
         if (createdAt == null) return "--";
         return String.valueOf(createdAt.getDayOfMonth());
     }
 
-    /**
-     * Returns the abbreviated month for display in the timeline (e.g., "Feb").
-     */
     public String getDisplayMonth() {
         if (createdAt == null) return "--";
         return createdAt.format(DateTimeFormatter.ofPattern("MMM"));
     }
 
-    /**
-     * Returns the time formatted as HH:mm for display (e.g., "14:30").
-     */
     public String getDisplayTime() {
         if (createdAt == null) return "--:--";
         return createdAt.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 
-    /**
-     * Returns a truncated preview of the response (max 200 chars).
-     */
     public String getResponsePreview() {
         if (responseText == null) return "";
         if (responseText.length() <= 200) return responseText;
@@ -78,14 +77,6 @@ public class QueryHistory {
     // ==============================
     // Getters and Setters
     // ==============================
-
-    public Long getQueryId() {
-        return queryId;
-    }
-
-    public void setQueryId(Long queryId) {
-        this.queryId = queryId;
-    }
 
     public Long getUserId() {
         return userId;
@@ -125,13 +116,5 @@ public class QueryHistory {
 
     public void setExecutionTimeMs(Integer executionTimeMs) {
         this.executionTimeMs = executionTimeMs;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

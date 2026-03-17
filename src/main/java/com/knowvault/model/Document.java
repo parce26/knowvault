@@ -2,29 +2,49 @@ package com.knowvault.model;
 
 import java.time.LocalDateTime;
 
-public class Document {
+/**
+ * Document - Entity representing an uploaded document.
+ * Extends BaseEntity to inherit common fields (id, createdAt, updatedAt).
+ *
+ * @author Sebastián González Tabares
+ */
+public class Document extends BaseEntity {
 
-    private Long documentId;
     private String title;
+    private String description;
     private String originalFileName;
     private String storedFileName;
     private String filePath;
-    private long fileSize;
+    private Long fileSize;
     private String mimeType;
     private Long categoryId;
     private String categoryName;
     private Long uploadedBy;
     private String status;
     private LocalDateTime uploadDate;
-    private LocalDateTime updatedAt;
+    private LocalDateTime lastAccessed;
 
+    // ==============================
+    // Implement abstract method
+    // ==============================
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    // Alias for compatibility
     public Long getDocumentId() {
-        return documentId;
+        return id;
     }
 
     public void setDocumentId(Long documentId) {
-        this.documentId = documentId;
+        this.id = documentId;
     }
+
+    // ==============================
+    // Getters and Setters
+    // ==============================
 
     public String getTitle() {
         return title;
@@ -32,6 +52,14 @@ public class Document {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getOriginalFileName() {
@@ -58,11 +86,11 @@ public class Document {
         this.filePath = filePath;
     }
 
-    public long getFileSize() {
+    public Long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(long fileSize) {
+    public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
     }
 
@@ -112,6 +140,14 @@ public class Document {
 
     public void setUploadDate(LocalDateTime uploadDate) {
         this.uploadDate = uploadDate;
+    }
+
+    public LocalDateTime getLastAccessed() {
+        return lastAccessed;
+    }
+
+    public void setLastAccessed(LocalDateTime lastAccessed) {
+        this.lastAccessed = lastAccessed;
     }
 
     public LocalDateTime getUpdatedAt() {

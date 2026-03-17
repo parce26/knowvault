@@ -2,15 +2,27 @@ package com.knowvault.repository;
 
 import com.knowvault.model.User;
 
-import java.util.List;
-import java.util.Optional;
-
+/**
+ * UserRepository - Interface defining the contract for user data access.
+ * JdbcUserRepository provides the concrete JDBC implementation.
+ *
+ * @author Sebastián González Tabares
+ */
 public interface UserRepository {
-    List<User> findAll();
-    Optional<User> findById(int userId);
-    Optional<User> findByUsername(String username);
-    Optional<User> findByEmail(String email);
-    int save(User user);          // retorna id creado
-    boolean update(User user);    // true si actualizó 1 fila
-    boolean deleteById(int userId);
+
+    User findById(Long id);
+
+    User findByEmail(String email);
+
+    User findByUsername(String username);
+
+    void save(User user);
+
+    void update(User user);
+
+    void delete(Long id);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByUsername(String username);
 }

@@ -1,23 +1,18 @@
 package com.knowvault.model;
 
-import java.time.LocalDateTime;
-
 /**
- * DocumentChunk - Represents a text fragment extracted from a document.
- * Used by the RAG pipeline to search relevant content for AI queries.
+ * DocumentChunk - Entity representing a text fragment from a document.
+ * Extends BaseEntity to inherit common fields (id, createdAt, updatedAt).
+ * Used by the RAG pipeline for semantic search.
  *
- * @author Kevin García Gutiérrez
+ * @author Sebastián González Tabares
  */
-public class DocumentChunk {
+public class DocumentChunk extends BaseEntity {
 
-    private Long chunkId;
     private Long documentId;
     private String chunkText;
     private Integer chunkOrder;
     private Integer pageNumber;
-    private LocalDateTime createdAt;
-
-    // Optional: document title joined from documents table
     private String documentTitle;
 
     // ==============================
@@ -26,7 +21,8 @@ public class DocumentChunk {
 
     public DocumentChunk() {}
 
-    public DocumentChunk(Long documentId, String chunkText, Integer chunkOrder, Integer pageNumber) {
+    public DocumentChunk(Long documentId, String chunkText,
+                         Integer chunkOrder, Integer pageNumber) {
         this.documentId = documentId;
         this.chunkText = chunkText;
         this.chunkOrder = chunkOrder;
@@ -34,16 +30,26 @@ public class DocumentChunk {
     }
 
     // ==============================
-    // Getters and Setters
+    // Implement abstract method
     // ==============================
 
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    // Alias for compatibility
     public Long getChunkId() {
-        return chunkId;
+        return id;
     }
 
     public void setChunkId(Long chunkId) {
-        this.chunkId = chunkId;
+        this.id = chunkId;
     }
+
+    // ==============================
+    // Getters and Setters
+    // ==============================
 
     public Long getDocumentId() {
         return documentId;
@@ -75,14 +81,6 @@ public class DocumentChunk {
 
     public void setPageNumber(Integer pageNumber) {
         this.pageNumber = pageNumber;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public String getDocumentTitle() {

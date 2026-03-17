@@ -1,31 +1,40 @@
 package com.knowvault.model;
 
-import java.time.LocalDateTime;
-
-public class User {
-
-    private Long userId;
+/**
+ * User - Entity representing a system user.
+ * Extends BaseEntity to inherit common fields (id, createdAt, updatedAt).
+ *
+ * @author Sebastián González Tabares
+ */
+public class User extends BaseEntity {
 
     private String username;
-
     private String email;
-
     private String passwordHash;
-
+    private String fullName;
     private String role;
 
-    private LocalDateTime createdAt;
+    // ==============================
+    // Implement abstract method
+    // ==============================
 
-    private LocalDateTime updatedAt;
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-
+    // Alias for compatibility
     public Long getUserId() {
-        return userId;
+        return id;
     }
 
     public void setUserId(Long userId) {
-        this.userId = userId;
+        this.id = userId;
     }
+
+    // ==============================
+    // Getters and Setters
+    // ==============================
 
     public String getUsername() {
         return username;
@@ -51,27 +60,19 @@ public class User {
         this.passwordHash = passwordHash;
     }
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getRole() {
         return role;
     }
 
     public void setRole(String role) {
         this.role = role;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
