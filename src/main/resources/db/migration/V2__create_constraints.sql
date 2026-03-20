@@ -1,8 +1,6 @@
 -- =====================================================
--- KnowVault - Foreign Keys
+-- KnowVault - V2 Create Foreign Key Constraints
 -- =====================================================
-
-USE knowvault;
 
 ALTER TABLE categories
 ADD CONSTRAINT fk_categories_parent

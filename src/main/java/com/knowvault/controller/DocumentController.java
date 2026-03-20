@@ -29,6 +29,12 @@ import com.knowvault.service.PdfTextExtractorService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+/**
+ * DocumentController - handles document management endpoints.
+ * Covers upload, list, download, view, and delete operations.
+ *
+ * @author Sebastián González Tabares
+ */
 @Controller
 @RequestMapping("/documents")
 public class DocumentController {
@@ -51,7 +57,7 @@ public class DocumentController {
     }
 
     // ==============================
-    // GET /documents — list all
+    // GET /documents
     // ==============================
 
     @GetMapping
@@ -64,15 +70,18 @@ public class DocumentController {
             return "redirect:/login";
         }
 
+        User user = (User) session.getAttribute("loggedUser");
         List<Document> documents = documentService.searchDocuments(search);
+
         model.addAttribute("documents", documents);
         model.addAttribute("search", search);
+        model.addAttribute("user", user);
 
         return "documents/list";
     }
 
     // ==============================
-    // GET /documents/upload — show form
+    // GET /documents/upload
     // ==============================
 
     @GetMapping("/upload")
@@ -81,53 +90,65 @@ public class DocumentController {
             return "redirect:/login";
         }
 
+        User user = (User) session.getAttribute("loggedUser");
+
         model.addAttribute("form", new DocumentUploadForm());
+        model.addAttribute("user", user);
+        model.addAttribute("categories", documentService.getAllCategories());
+
         return "documents/upload";
     }
 
     // ==============================
-    // POST /documents/upload — save file + extract chunks
+    // POST /documents/upload
     // ==============================
 
     @PostMapping("/upload")
     public String uploadDocument(
             @Valid @ModelAttribute("form") DocumentUploadForm form,
             BindingResult bindingResult,
-            HttpSession session
+            HttpSession session,
+            Model model
     ) throws IOException {
 
         if (session.getAttribute("loggedUser") == null) {
             return "redirect:/login";
         }
 
+        User user = (User) session.getAttribute("loggedUser");
+
         if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", documentService.getAllCategories());
+            model.addAttribute("user", user);
             return "documents/upload";
         }
 
         MultipartFile file = form.getFile();
 
         if (file == null || file.isEmpty()) {
+            model.addAttribute("error", "Please select a file to upload.");
+            model.addAttribute("categories", documentService.getAllCategories());
+            model.addAttribute("user", user);
             return "documents/upload";
         }
 
-        // Validate MIME type — only allow documents
+        // Validate MIME type
         String mimeType = file.getContentType();
         if (mimeType == null || (!mimeType.equals("application/pdf") &&
                 !mimeType.equals("application/msword") &&
                 !mimeType.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
                 !mimeType.equals("text/plain"))) {
-            bindingResult.rejectValue("file", "invalid.type",
-                    "Only PDF, DOC, DOCX, and TXT files are allowed.");
+            model.addAttribute("error", "Only PDF, DOC, DOCX, and TXT files are allowed.");
+            model.addAttribute("categories", documentService.getAllCategories());
+            model.addAttribute("user", user);
             return "documents/upload";
         }
-
-        User user = (User) session.getAttribute("loggedUser");
 
         // Store file on disk
         String storedFileName = fileStorageService.storeFile(file);
         String fullPath = "uploads/" + storedFileName;
 
-        // Save document metadata to DB
+        // Save document metadata including category
         documentService.createDocument(
                 form.getTitle(),
                 file.getOriginalFilename(),
@@ -135,6 +156,7 @@ public class DocumentController {
                 fullPath,
                 file.getSize(),
                 mimeType,
+                form.getCategory(),   // ← category now passed
                 user.getUserId()
         );
 
@@ -177,12 +199,12 @@ public class DocumentController {
         Document doc = documentService.getDocumentById(id);
         Resource resource = fileStorageService.loadFileAsResource(doc.getFilePath());
 
-        String mime = doc.getMimeType() != null
+        String mimeType = doc.getMimeType() != null
                 ? doc.getMimeType()
                 : MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(mime))
+                .contentType(MediaType.parseMediaType(mimeType))
                 .body(resource);
     }
 

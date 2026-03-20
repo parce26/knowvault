@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.knowvault.model.User;
 import com.knowvault.model.dto.LoginForm;
+import com.knowvault.model.dto.RegisterForm;
+import com.knowvault.model.dto.UserCreateForm;
 import com.knowvault.service.DocumentService;
 import com.knowvault.service.QueryHistoryService;
 import com.knowvault.service.UserService;
@@ -31,6 +33,78 @@ public class ViewController {
         this.userService = userService;
         this.documentService = documentService;
         this.queryHistoryService = queryHistoryService;
+    }
+
+    // =========================================
+    // LANDING PAGE
+    // =========================================
+
+    @GetMapping("/")
+    public String landing(HttpSession session) {
+        if (isLogged(session)) {
+            return "redirect:/dashboard";
+        }
+        return "landing";
+    }
+
+    // =========================================
+    // REGISTER PAGE
+    // =========================================
+
+    @GetMapping("/register")
+    public String registerPage(HttpSession session, Model model) {
+        if (isLogged(session)) {
+            return "redirect:/dashboard";
+        }
+        model.addAttribute("form", new RegisterForm());
+        return "auth/register";
+    }
+
+    // =========================================
+    // REGISTER PROCESS
+    // =========================================
+
+    @PostMapping("/register")
+    public String register(
+            @Valid @ModelAttribute("form") RegisterForm form,
+            BindingResult bindingResult,
+            HttpSession session,
+            Model model
+    ) {
+        // Validation errors
+        if (bindingResult.hasErrors()) {
+            return "auth/register";
+        }
+
+        // Passwords must match
+        if (!form.passwordsMatch()) {
+            model.addAttribute("registerError", "Passwords do not match");
+            return "auth/register";
+        }
+
+        // Try to create the user
+        try {
+            UserCreateForm createForm = new UserCreateForm();
+            createForm.setUsername(form.getUsername());
+            createForm.setEmail(form.getEmail());
+            createForm.setPassword(form.getPassword());
+            createForm.setRole("user");
+
+            userService.createUser(createForm);
+
+        } catch (Exception e) {
+            model.addAttribute("registerError", e.getMessage());
+            return "auth/register";
+        }
+
+        // Auto-login after registration
+        User user = userService.authenticate(form.getEmail(), form.getPassword());
+        if (user != null) {
+            session.setAttribute("loggedUser", user);
+            return "redirect:/dashboard";
+        }
+
+        return "redirect:/login";
     }
 
     // =========================================
@@ -76,7 +150,7 @@ public class ViewController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login";
+        return "redirect:/";
     }
 
     // =========================================
@@ -85,14 +159,12 @@ public class ViewController {
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
-
         if (!isLogged(session)) {
             return "redirect:/login";
         }
 
         User user = (User) session.getAttribute("loggedUser");
 
-        // Stats reales desde la base de datos
         int totalDocuments = documentService.getTotalDocuments();
         String storageUsed = documentService.formatStorageSize(
                 documentService.getTotalStorageUsedBytes()
@@ -114,14 +186,11 @@ public class ViewController {
 
     @GetMapping("/ask")
     public String askAI(HttpSession session, Model model) {
-
         if (!isLogged(session)) {
             return "redirect:/login";
         }
-
         User user = (User) session.getAttribute("loggedUser");
         model.addAttribute("user", user);
-
         return "ai/ask";
     }
 

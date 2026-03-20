@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - KnowVault</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: #F7F9FF;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background-image:
+                linear-gradient(rgba(0,82,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,82,255,0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 18px;
+            border: 1px solid #E2E8F0;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: #0052FF;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 18px; height: 18px; fill: white; }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F172A;
+        }
+
+        .logo-text span { color: #0052FF; }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #64748B;
+            margin-bottom: 28px;
+            font-weight: 300;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: #0F172A;
+            transition: all 0.15s;
+            background: white;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0052FF;
+            box-shadow: 0 0 0 3px rgba(0,82,255,0.08);
+        }
+
+        input::placeholder { color: #94A3B8; }
+
+        .field-error {
+            font-size: 12px;
+            color: #EF4444;
+            margin-top: 4px;
+        }
+
+        .global-error {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #DC2626;
+            margin-bottom: 18px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: #0052FF;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+            box-shadow: 0 4px 14px rgba(0,82,255,0.3);
+        }
+
+        .btn-submit:hover {
+            background: #003ACC;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,82,255,0.4);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 13px;
+            color: #94A3B8;
+            position: relative;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #E2E8F0;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        .login-link {
+            text-align: center;
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .login-link a {
+            color: #0052FF;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+
+    <div class="logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+            </svg>
+        </div>
+        <span class="logo-text">Know<span>Vault</span></span>
+    </div>
+
+    <h1>Create your account</h1>
+    <p class="subtitle">Start managing your knowledge base today</p>
+
+    <!-- Global errors -->
+    <div class="global-error" th:if="${registerError}" th:text="${registerError}"></div>
+
+    <form th:action="@{/register}" method="post" th:object="${form}">
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text"
+                   id="username"
+                   th:field="*{username}"
+                   placeholder="e.g. johndoe"
+                   autocomplete="username">
+            <div class="field-error" th:if="${#fields.hasErrors('username')}"
+                 th:errors="*{username}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email"
+                   id="email"
+                   th:field="*{email}"
+                   placeholder="you@company.com"
+                   autocomplete="email">
+            <div class="field-error" th:if="${#fields.hasErrors('email')}"
+                 th:errors="*{email}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password"
+                   id="password"
+                   th:field="*{password}"
+                   placeholder="At least 6 characters"
+                   autocomplete="new-password">
+            <div class="field-error" th:if="${#fields.hasErrors('password')}"
+                 th:errors="*{password}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Confirm password</label>
+            <input type="password"
+                   id="confirmPassword"
+                   th:field="*{confirmPassword}"
+                   placeholder="Repeat your password"
+                   autocomplete="new-password">
+            <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}"
+                 th:errors="*{confirmPassword}"></div>
+        </div>
+
+        <button type="submit" class="btn-submit">Create Account</button>
+
+    </form>
+
+    <div class="divider">or</div>
+
+    <div class="login-link">
+        Already have an account? <a href="/login">Sign in</a>
+    </div>
+
+</div>
+
+</body>
+</html>

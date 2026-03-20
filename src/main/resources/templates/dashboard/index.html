@@ -3,62 +3,723 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KnowVault - Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <title>KnowVault — Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --blue:        #0052FF;
+            --blue-dark:   #003ACC;
+            --blue-light:  #EBF1FF;
+            --navy:        #050F2C;
+            --white:       #FFFFFF;
+            --bg:          #F7F9FF;
+            --sidebar-w:   220px;
+            --header-h:    60px;
+            --gray-100:    #F1F5F9;
+            --gray-200:    #E2E8F0;
+            --gray-400:    #94A3B8;
+            --gray-500:    #64748B;
+            --gray-700:    #334155;
+            --gray-900:    #0F172A;
+            --green:       #059669;
+            --green-light: #D1FAE5;
+            --amber:       #D97706;
+            --amber-light: #FEF3C7;
+            --radius:      12px;
+            --radius-lg:   16px;
+        }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--gray-900);
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--header-h);
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px 0 0;
+            z-index: 200;
+        }
+
+        .header-logo {
+            width: var(--sidebar-w);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg { width: 15px; height: 15px; fill: white; }
+
+        .logo-text {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .logo-text span { color: var(--blue); }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Avatar */
+        .avatar-wrap { position: relative; }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            border: 2px solid var(--gray-200);
+            transition: border-color 0.15s;
+        }
+
+        .avatar:hover { border-color: var(--blue); }
+
+        .avatar-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 200px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            padding: 6px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: all 0.15s;
+            z-index: 300;
+        }
+
+        .avatar-wrap:hover .avatar-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 10px 10px 8px;
+            border-bottom: 1px solid var(--gray-100);
+            margin-bottom: 4px;
+        }
+
+        .dropdown-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .dropdown-email {
+            font-size: 11px;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--gray-700);
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .dropdown-item:hover { background: var(--gray-100); }
+        .dropdown-item.danger { color: #DC2626; }
+        .dropdown-item svg { width: 14px; height: 14px; fill: currentColor; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: var(--header-h);
+            left: 0;
+            width: var(--sidebar-w);
+            height: calc(100vh - var(--header-h));
+            background: white;
+            border-right: 1px solid var(--gray-200);
+            padding: 20px 12px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .nav-section { margin-bottom: 24px; }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray-400);
+            padding: 0 10px;
+            margin-bottom: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 9px;
+            font-size: 13.5px;
+            font-weight: 400;
+            color: var(--gray-500);
+            text-decoration: none;
+            transition: all 0.15s;
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        .nav-item.active {
+            background: var(--blue-light);
+            color: var(--blue);
+            font-weight: 500;
+        }
+
+        .nav-item svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--header-h);
+            padding: 32px;
+            min-height: calc(100vh - var(--header-h));
+        }
+
+        /* ── WELCOME BANNER ── */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--navy) 0%, #0A1F4E 60%, #0C2A6E 100%);
+            border-radius: var(--radius-lg);
+            padding: 36px 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(0,82,255,0.3) 0%, transparent 70%);
+        }
+
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: 30%;
+            width: 240px; height: 240px;
+            background: radial-gradient(circle, rgba(0,82,255,0.15) 0%, transparent 70%);
+        }
+
+        .welcome-text { position: relative; z-index: 1; }
+
+        .welcome-greeting {
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: white;
+            line-height: 1.3;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .welcome-sub {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        .btn-upload {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 22px;
+            background: white;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--blue);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
+        }
+
+        .btn-upload:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .btn-upload svg { width: 15px; height: 15px; fill: var(--blue); }
+
+        /* ── STATS ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--gray-400);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'Syne', sans-serif;
+            font-size: 34px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-note {
+            font-size: 12px;
+            font-weight: 300;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon svg { width: 18px; height: 18px; fill: currentColor; }
+
+        /* Blue — Documents */
+        .stat-blue .stat-value { color: var(--blue); }
+        .stat-blue .stat-note  { color: var(--blue); opacity: 0.7; }
+        .stat-blue .stat-icon  { background: var(--blue-light); color: var(--blue); }
+
+        /* Green — Queries */
+        .stat-green .stat-value { color: var(--green); }
+        .stat-green .stat-note  { color: var(--green); opacity: 0.7; }
+        .stat-green .stat-icon  { background: var(--green-light); color: var(--green); }
+
+        /* Amber — Storage */
+        .stat-amber .stat-value { color: var(--amber); }
+        .stat-amber .stat-note  { color: var(--amber); opacity: 0.7; }
+        .stat-amber .stat-icon  { background: var(--amber-light); color: var(--amber); }
+
+        /* ── CONTENT CARDS ── */
+        .content-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .card-action {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--blue);
+            text-decoration: none;
+            transition: opacity 0.15s;
+        }
+
+        .card-action:hover { opacity: 0.7; }
+
+        /* ── TABLE ── */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .doc-table thead th {
+            padding: 10px 24px;
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: var(--gray-400);
+            background: var(--gray-100);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .doc-table tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+            transition: background 0.1s;
+        }
+
+        .doc-table tbody tr:last-child { border-bottom: none; }
+        .doc-table tbody tr:hover { background: #FAFBFF; }
+
+        .doc-table tbody td {
+            padding: 13px 24px;
+            font-size: 13px;
+            color: var(--gray-700);
+            vertical-align: middle;
+        }
+
+        .doc-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .doc-file-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            background: var(--blue-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .doc-file-icon svg { width: 14px; height: 14px; fill: var(--blue); }
+
+        .doc-name {
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: var(--gray-100);
+            color: var(--gray-500);
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gray-100);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .empty-icon svg { width: 22px; height: 22px; fill: var(--gray-400); }
+
+        .empty-title {
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 4px;
+        }
+
+        .empty-sub {
+            font-size: 13px;
+            color: var(--gray-400);
+            font-weight: 300;
+            margin-bottom: 16px;
+        }
+
+        .btn-empty {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-empty:hover { background: var(--blue-dark); transform: translateY(-1px); }
+        .btn-empty svg { width: 13px; height: 13px; fill: white; }
+
+        /* ── ACTIVITY ── */
+        .activity-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            text-decoration: none;
+            color: var(--gray-700);
+            transition: background 0.1s;
+        }
+
+        .activity-link:hover { background: #FAFBFF; }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--blue);
+            flex-shrink: 0;
+        }
+
+        .activity-text { font-size: 13px; }
+        .activity-text span { color: var(--blue); font-weight: 500; }
+
+        /* ── AI CHAT BUTTON ── */
+        .ai-fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 50px;
+            height: 50px;
+            background: var(--blue);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,82,255,0.4);
+            transition: all 0.2s;
+            z-index: 500;
+        }
+
+        .ai-fab:hover { transform: scale(1.08); box-shadow: 0 8px 28px rgba(0,82,255,0.5); }
+        .ai-fab svg { width: 22px; height: 22px; fill: white; }
+
+        /* ── AI CHAT POPUP ── */
+        .ai-popup {
+            position: fixed;
+            bottom: 90px;
+            right: 28px;
+            width: 320px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+            overflow: hidden;
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            max-height: 420px;
+        }
+
+        .ai-popup.open { display: flex; }
+
+        .ai-popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            background: var(--navy);
+        }
+
+        .ai-popup-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .ai-popup-close {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .ai-popup-close:hover { color: white; }
+
+        .ai-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ai-msg {
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 90%;
+        }
+
+        .ai-msg.bot {
+            background: white;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-700);
+            align-self: flex-start;
+        }
+
+        .ai-msg.user {
+            background: var(--blue);
+            color: white;
+            align-self: flex-end;
+        }
+
+        .ai-popup-input {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .ai-popup-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1.5px solid var(--gray-200);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .ai-popup-input input:focus { border-color: var(--blue); }
+
+        .ai-send {
+            padding: 8px 14px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .ai-send:hover { background: var(--blue-dark); }
+    </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="header">
-    <a href="/dashboard" class="logo-container">
-        <img src="/images/logo.png" alt="KnowVault" class="logo-img">
+    <a href="/dashboard" class="header-logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+        </div>
+        <span class="logo-text">Know<span>Vault</span></span>
     </a>
 
-    <div class="search-container">
-        <span class="search-icon">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
-            </svg>
-        </span>
-        <input type="text" class="search-input" placeholder="Search documents..." id="searchInput">
-    </div>
-
-    <div class="header-actions">
-        <button class="notification-btn">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-            </svg>
-            <span class="notification-badge"></span>
-        </button>
-
-        <div class="user-avatar-container">
-            <div class="user-avatar" id="userAvatar">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white"/>
-                    <path d="M12 14C6.47715 14 2 18.4772 2 24H22C22 18.4772 17.5228 14 12 14Z" fill="white" opacity="0.9"/>
-                </svg>
-                <span id="userInitials"
-                      th:text="${user != null ? user.username.substring(0,1).toUpperCase() : 'U'}">U</span>
-                <input type="file" class="avatar-upload" id="avatarUpload" accept="image/*">
-            </div>
-
-            <div class="profile-dropdown">
-                <div class="profile-header">
-                    <div class="profile-name" th:text="${user != null ? user.username : 'User'}">User</div>
-                    <div class="profile-email" th:text="${user != null ? user.email : ''}">user@knowvault.com</div>
+    <div class="header-right">
+        <div class="avatar-wrap">
+            <div class="avatar" th:text="${user != null ? user.username.substring(0,1).toUpperCase() : 'U'}">U</div>
+            <div class="avatar-dropdown">
+                <div class="dropdown-header">
+                    <div class="dropdown-name" th:text="${user != null ? user.username : 'User'}">User</div>
+                    <div class="dropdown-email" th:text="${user != null ? user.email : ''}">user@email.com</div>
                 </div>
-                <a href="/users" class="profile-menu-item">
-                    <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                    </svg>
-                    <span>My Profile</span>
-                </a>
-                <hr style="margin: 8px 0; border: none; border-top: 1px solid var(--gray-200);">
-                <a href="/logout" class="profile-menu-item danger">
-                    <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
-                    </svg>
-                    <span>Log Out</span>
+                <a href="/logout" class="dropdown-item danger">
+                    <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+                    Sign out
                 </a>
             </div>
         </div>
@@ -67,126 +728,84 @@
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <nav class="nav-section">
+    <div class="nav-section">
         <a href="/dashboard" class="nav-item active">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                </svg>
-            </span>
-            <span>Home</span>
+            <svg viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+            Home
         </a>
-
         <a href="/documents" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>My Documents</span>
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+            My Documents
         </a>
-
         <a href="/history" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>History</span>
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+            History
         </a>
-
         <a href="/ask" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>Ask AI</span>
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/></svg>
+            Ask AI
         </a>
-    </nav>
+    </div>
 
     <div class="nav-section">
-        <div class="nav-section-title">Quick Actions</div>
+        <div class="nav-label">Quick Actions</div>
         <a href="/documents/upload" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>Upload Document</span>
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+            Upload Document
         </a>
     </div>
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="main-content">
+<!-- MAIN -->
+<div class="main">
 
-    <!-- Page header -->
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">
-                Welcome back, <span th:text="${user != null ? user.username : 'User'}">User</span>
-            </h1>
-            <p class="page-subtitle">Your personal knowledge hub</p>
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+        <div class="welcome-text">
+            <div class="welcome-greeting">
+                Welcome back, <span th:text="${user != null ? user.username : 'User'}">User</span> 👋
+            </div>
+            <div class="welcome-sub">Here's what's happening in your knowledge base</div>
         </div>
-        <a href="/documents/upload" class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
-            </svg>
-            <span>Upload Document</span>
+        <a href="/documents/upload" class="btn-upload">
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+            Upload Document
         </a>
     </div>
 
-    <!-- Stats cards — datos reales desde el backend -->
+    <!-- Stats -->
     <div class="stats-grid">
 
-        <!-- Total Documents -->
-        <div class="stat-card">
-            <div class="stat-header">
-                <div>
-                    <div class="stat-label">Total Documents</div>
-                    <div class="stat-value" th:text="${totalDocuments}">0</div>
-                    <div class="stat-change">documents in your knowledge base</div>
-                </div>
-                <div class="stat-icon">
-                    <svg width="22" height="22" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
+        <div class="stat-card stat-blue">
+            <div>
+                <div class="stat-label">Total Documents</div>
+                <div class="stat-value" th:text="${totalDocuments}">0</div>
+                <div class="stat-note">in your knowledge base</div>
+            </div>
+            <div class="stat-icon">
+                <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
             </div>
         </div>
 
-        <!-- AI Queries -->
-        <div class="stat-card">
-            <div class="stat-header">
-                <div>
-                    <div class="stat-label">AI Queries</div>
-                    <div class="stat-value" th:text="${totalQueries}">0</div>
-                    <div class="stat-change">questions answered by AI</div>
-                </div>
-                <div class="stat-icon">
-                    <svg width="22" height="22" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
+        <div class="stat-card stat-green">
+            <div>
+                <div class="stat-label">AI Queries</div>
+                <div class="stat-value" th:text="${totalQueries}">0</div>
+                <div class="stat-note">questions answered by AI</div>
+            </div>
+            <div class="stat-icon">
+                <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/></svg>
             </div>
         </div>
 
-        <!-- Storage Used -->
-        <div class="stat-card">
-            <div class="stat-header">
-                <div>
-                    <div class="stat-label">Storage Used</div>
-                    <div class="stat-value" th:text="${storageUsed}">0 MB</div>
-                    <div class="stat-change">of available storage</div>
-                </div>
-                <div class="stat-icon">
-                    <svg width="22" height="22" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z"/>
-                        <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z"/>
-                        <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z"/>
-                    </svg>
-                </div>
+        <div class="stat-card stat-amber">
+            <div>
+                <div class="stat-label">Storage Used</div>
+                <div class="stat-value" th:text="${storageUsed}">0 KB</div>
+                <div class="stat-note">of available storage</div>
+            </div>
+            <div class="stat-icon">
+                <svg viewBox="0 0 20 20"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z"/><path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z"/><path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z"/></svg>
             </div>
         </div>
 
@@ -195,165 +814,129 @@
     <!-- Recent Documents -->
     <div class="content-card">
         <div class="card-header">
-            <h2 class="card-title">Recent Documents</h2>
-            <a href="/documents" class="card-action">View All →</a>
+            <div class="card-title">Recent Documents</div>
+            <a href="/documents" class="card-action">View all →</a>
         </div>
 
-        <!-- Empty state -->
-        <div th:if="${recentDocuments == null or recentDocuments.isEmpty()}">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Date Added</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="4" class="empty-state">
-                            <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor"
-                                 style="margin: 0 auto 16px; opacity: 0.3; display:block;">
-                                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
-                            </svg>
-                            <div style="font-weight: 600; margin-bottom: 8px;">No documents yet</div>
-                            <div>Upload your first document to get started</div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <!-- Empty -->
+        <div class="empty-state" th:if="${recentDocuments == null or recentDocuments.isEmpty()}">
+            <div class="empty-icon">
+                <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="empty-title">No documents yet</div>
+            <div class="empty-sub">Upload your first document to get started</div>
+            <a href="/documents/upload" class="btn-empty">
+                <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                Upload Document
+            </a>
         </div>
 
-        <!-- Documents table con datos reales -->
-        <div th:if="${recentDocuments != null and !recentDocuments.isEmpty()}">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Date Added</th>
-                        <th>Size</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="doc : ${recentDocuments}">
-                        <td th:text="${doc.title}">Document name</td>
-                        <td th:text="${doc.categoryName != null ? doc.categoryName : 'Uncategorized'}">Category</td>
-                        <td th:text="${#temporals.format(doc.uploadDate, 'MMM d, yyyy')}">Jan 1, 2025</td>
-                        <td th:text="${doc.fileSize < 1024 * 1024 ?
-                            #numbers.formatDecimal(doc.fileSize / 1024.0, 1, 2) + ' KB' :
-                            #numbers.formatDecimal(doc.fileSize / 1024.0 / 1024.0, 1, 2) + ' MB'}">0 MB</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <!-- Table -->
+        <table class="doc-table" th:if="${recentDocuments != null and !recentDocuments.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Date Added</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="doc : ${recentDocuments}">
+                    <td>
+                        <div class="doc-name-cell">
+                            <div class="doc-file-icon">
+                                <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+                            </div>
+                            <span class="doc-name" th:text="${doc.title}">Document</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="category-badge"
+                              th:text="${doc.categoryName != null ? doc.categoryName : 'Uncategorized'}">
+                            Uncategorized
+                        </span>
+                    </td>
+                    <td th:text="${#temporals.format(doc.uploadDate, 'MMM d, yyyy')}">Jan 1</td>
+                    <td th:text="${doc.fileSize < 1024 * 1024 ?
+                        #numbers.formatDecimal(doc.fileSize / 1024.0, 1, 2) + ' KB' :
+                        #numbers.formatDecimal(doc.fileSize / 1024.0 / 1024.0, 1, 2) + ' MB'}">0 KB</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <!-- Recent Activity — historial de queries -->
+    <!-- Recent Activity -->
     <div class="content-card">
         <div class="card-header">
-            <h2 class="card-title">Recent Activity</h2>
-            <a href="/history" class="card-action">View All →</a>
+            <div class="card-title">Recent Activity</div>
+            <a href="/history" class="card-action">View history →</a>
         </div>
-        <div class="empty-state">
-            <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor"
-                 style="margin: 0 auto 16px; opacity: 0.3; display:block;">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-            </svg>
-            <div style="font-weight: 600; margin-bottom: 8px;">Activity tracked</div>
-            <div>
-                <a href="/history" style="color: var(--primary);">View your full query history →</a>
+        <a href="/history" class="activity-link">
+            <div class="activity-dot"></div>
+            <div class="activity-text">
+                View your full <span>AI query history</span> — see all past questions and answers
             </div>
-        </div>
+        </a>
+        <a href="/ask" class="activity-link">
+            <div class="activity-dot" style="background: var(--green);"></div>
+            <div class="activity-text">
+                <span>Ask AI</span> — get instant answers from your documents
+            </div>
+        </a>
     </div>
 
 </div>
 
-<!-- AI CHAT FLOTANTE -->
-<button class="ai-chat-btn" onclick="toggleAIChat()">
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"/>
-    </svg>
+<!-- AI FAB -->
+<button class="ai-fab" onclick="toggleChat()">
+    <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/></svg>
 </button>
 
-<div class="ai-chat-popup" id="aiChatPopup">
-    <div class="chat-header">
-        <h3 class="chat-title">KnowVault Assist</h3>
-        <button class="chat-close" onclick="toggleAIChat()">×</button>
+<!-- AI POPUP -->
+<div class="ai-popup" id="aiPopup">
+    <div class="ai-popup-header">
+        <span class="ai-popup-title">KnowVault AI</span>
+        <button class="ai-popup-close" onclick="toggleChat()">×</button>
     </div>
-    <div class="chat-messages" id="chatMessages">
-        <div class="chat-message ai">
-            Hello! I'm KnowVault Assist. Ask me anything about your documents or
-            <a href="/ask" style="color:var(--primary);">go to the full AI page</a>.
-        </div>
+    <div class="ai-messages" id="aiMessages">
+        <div class="ai-msg bot">Hi! Ask me anything about your documents, or go to the <a href="/ask" style="color:var(--blue);">Ask AI page</a> for the full experience.</div>
     </div>
-    <div class="chat-input-area">
-        <div class="chat-input-wrapper">
-            <input type="text" class="chat-input" placeholder="Ask me anything..." id="chatInput">
-            <button class="chat-send" onclick="sendMessage()">Send</button>
-        </div>
+    <div class="ai-popup-input">
+        <input type="text" id="chatInput" placeholder="Ask a question...">
+        <button class="ai-send" onclick="sendChat()">Send</button>
     </div>
 </div>
 
 <script>
-    function toggleAIChat() {
-        document.getElementById('aiChatPopup').classList.toggle('active');
+    function toggleChat() {
+        document.getElementById('aiPopup').classList.toggle('open');
     }
 
-    function sendMessage() {
+    function sendChat() {
         const input = document.getElementById('chatInput');
-        const container = document.getElementById('chatMessages');
+        const msgs = document.getElementById('aiMessages');
         if (!input.value.trim()) return;
 
         const userMsg = document.createElement('div');
-        userMsg.className = 'chat-message user';
+        userMsg.className = 'ai-msg user';
         userMsg.textContent = input.value;
-        container.appendChild(userMsg);
+        msgs.appendChild(userMsg);
 
         setTimeout(() => {
-            const aiMsg = document.createElement('div');
-            aiMsg.className = 'chat-message ai';
-            aiMsg.innerHTML = 'For full AI answers, visit the <a href="/ask" style="color:var(--primary);">Ask AI page</a>.';
-            container.appendChild(aiMsg);
-            container.scrollTop = container.scrollHeight;
+            const botMsg = document.createElement('div');
+            botMsg.className = 'ai-msg bot';
+            botMsg.innerHTML = 'For full AI answers, visit the <a href="/ask" style="color:var(--blue);">Ask AI page</a>.';
+            msgs.appendChild(botMsg);
+            msgs.scrollTop = msgs.scrollHeight;
         }, 400);
 
         input.value = '';
-        container.scrollTop = container.scrollHeight;
+        msgs.scrollTop = msgs.scrollHeight;
     }
 
-    document.getElementById('chatInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') sendMessage();
-    });
-
-    // Avatar persistence
-    document.getElementById('avatarUpload').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            const avatar = document.getElementById('userAvatar');
-            const initials = document.getElementById('userInitials');
-            if (initials) initials.style.display = 'none';
-            const img = document.createElement('img');
-            img.src = event.target.result;
-            avatar.appendChild(img);
-            localStorage.setItem('userAvatar', event.target.result);
-        };
-        reader.readAsDataURL(file);
-    });
-
-    window.addEventListener('DOMContentLoaded', function () {
-        const saved = localStorage.getItem('userAvatar');
-        if (saved) {
-            const avatar = document.getElementById('userAvatar');
-            const initials = document.getElementById('userInitials');
-            if (initials) initials.style.display = 'none';
-            const img = document.createElement('img');
-            img.src = saved;
-            avatar.appendChild(img);
-        }
+    document.getElementById('chatInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendChat();
     });
 </script>
 

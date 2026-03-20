@@ -3,288 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KnowVault - Query History</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <title>KnowVault — Query History</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --blue: #0052FF; --blue-dark: #003ACC; --blue-light: #EBF1FF;
+            --navy: #050F2C; --bg: #F7F9FF;
+            --gray-100: #F1F5F9; --gray-200: #E2E8F0; --gray-400: #94A3B8;
+            --gray-500: #64748B; --gray-700: #334155; --gray-900: #0F172A;
+            --green: #059669; --green-light: #D1FAE5;
+            --red: #DC2626; --red-light: #FEE2E2;
+            --sidebar-w: 220px; --header-h: 60px;
+            --radius: 12px; --radius-lg: 16px;
+        }
+        body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--bg); color: var(--gray-900); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+        /* HEADER */
+        .header { position: fixed; top: 0; left: 0; right: 0; height: var(--header-h); background: white; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; padding: 0 24px 0 0; z-index: 200; }
+        .header-logo { width: var(--sidebar-w); display: flex; align-items: center; gap: 10px; padding: 0 20px; text-decoration: none; flex-shrink: 0; }
+        .logo-icon { width: 30px; height: 30px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .logo-icon svg { width: 15px; height: 15px; fill: white; }
+        .logo-text { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--gray-900); }
+        .logo-text span { color: var(--blue); }
+        .avatar-wrap { position: relative; }
+        .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--blue-dark)); display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: white; cursor: pointer; border: 2px solid var(--gray-200); transition: border-color 0.15s; }
+        .avatar:hover { border-color: var(--blue); }
+        .avatar-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 200px; background: white; border: 1px solid var(--gray-200); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.1); padding: 6px; opacity: 0; visibility: hidden; transform: translateY(-6px); transition: all 0.15s; z-index: 300; }
+        .avatar-wrap:hover .avatar-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-header { padding: 10px 10px 8px; border-bottom: 1px solid var(--gray-100); margin-bottom: 4px; }
+        .dropdown-name { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+        .dropdown-email { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+        .dropdown-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; font-size: 13px; color: var(--gray-700); text-decoration: none; transition: background 0.1s; }
+        .dropdown-item:hover { background: var(--gray-100); }
+        .dropdown-item.danger { color: var(--red); }
+        .dropdown-item svg { width: 14px; height: 14px; fill: currentColor; }
+
+        /* SIDEBAR */
+        .sidebar { position: fixed; top: var(--header-h); left: 0; width: var(--sidebar-w); height: calc(100vh - var(--header-h)); background: white; border-right: 1px solid var(--gray-200); padding: 20px 12px; overflow-y: auto; z-index: 100; }
+        .nav-section { margin-bottom: 24px; }
+        .nav-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-400); padding: 0 10px; margin-bottom: 6px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; font-size: 13.5px; color: var(--gray-500); text-decoration: none; transition: all 0.15s; margin-bottom: 2px; }
+        .nav-item:hover { background: var(--gray-100); color: var(--gray-900); }
+        .nav-item.active { background: var(--blue-light); color: var(--blue); font-weight: 500; }
+        .nav-item svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+
+        /* MAIN */
+        .main { margin-left: var(--sidebar-w); margin-top: var(--header-h); padding: 32px; min-height: calc(100vh - var(--header-h)); }
+
+        /* PAGE HEADER */
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; }
+        .page-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; line-height: 1.3; letter-spacing: -0.01em; }
+        .page-subtitle { font-size: 13px; color: var(--gray-400); font-weight: 300; }
+        .btn-danger { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; background: white; border: 1.5px solid var(--red); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--red); cursor: pointer; transition: all 0.2s; }
+        .btn-danger:hover { background: var(--red-light); }
+        .btn-danger svg { width: 14px; height: 14px; fill: currentColor; }
+
+        /* SEARCH */
+        .search-row { display: flex; gap: 10px; margin-bottom: 24px; }
+        .search-wrap { position: relative; flex: 1; }
+        .search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; fill: var(--gray-400); }
+        .search-wrap input { width: 100%; padding: 10px 14px 10px 38px; border: 1.5px solid var(--gray-200); border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--gray-900); background: white; outline: none; transition: border-color 0.15s; }
+        .search-wrap input:focus { border-color: var(--blue); }
+        .search-wrap input::placeholder { color: var(--gray-400); }
+        .btn-search { padding: 10px 20px; background: var(--blue); color: white; border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+        .btn-search:hover { background: var(--blue-dark); }
+
+        /* HISTORY CARDS */
+        .history-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .history-card { background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; transition: border-color 0.2s; }
+        .history-card:hover { border-color: var(--blue); }
+
+        .history-card-header { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--gray-100); }
+
+        .history-date-badge { text-align: center; background: var(--blue-light); border-radius: 10px; padding: 8px 12px; flex-shrink: 0; }
+        .history-date-day { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--blue); line-height: 1; }
+        .history-date-month { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--blue); opacity: 0.7; margin-top: 2px; }
+
+        .history-meta { flex: 1; min-width: 0; }
+        .history-time { font-size: 12px; color: var(--gray-400); font-weight: 300; margin-bottom: 4px; }
+        .history-question { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--gray-900); line-height: 1.4; }
+
+        .history-card-body { padding: 16px 20px; }
+
+        .history-answer-wrap { display: flex; gap: 10px; margin-bottom: 14px; }
+        .answer-accent { width: 3px; border-radius: 99px; background: var(--green); flex-shrink: 0; min-height: 20px; }
+        .answer-content { flex: 1; min-width: 0; }
+        .answer-label { font-size: 11px; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+
+        /* Markdown rendered answer */
+        .answer-text { font-size: 13px; color: var(--gray-700); line-height: 1.7; font-weight: 300; }
+        .answer-text h1, .answer-text h2, .answer-text h3 { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--gray-900); margin: 10px 0 6px; }
+        .answer-text h1 { font-size: 16px; }
+        .answer-text h2 { font-size: 15px; }
+        .answer-text h3 { font-size: 14px; }
+        .answer-text p { margin-bottom: 8px; }
+        .answer-text strong { font-weight: 600; color: var(--gray-900); }
+        .answer-text ul, .answer-text ol { padding-left: 20px; margin-bottom: 8px; }
+        .answer-text li { margin-bottom: 4px; }
+        .answer-text code { background: var(--gray-100); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+
+        .history-footer { display: flex; align-items: center; justify-content: space-between; }
+        .response-time { font-size: 11px; color: var(--gray-400); font-weight: 300; }
+
+        .btn-delete { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1px solid var(--gray-200); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--gray-500); background: white; cursor: pointer; transition: all 0.15s; }
+        .btn-delete:hover { background: var(--red-light); border-color: var(--red); color: var(--red); }
+        .btn-delete svg { width: 12px; height: 12px; fill: currentColor; }
+
+        /* EMPTY */
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; }
+        .empty-icon { width: 56px; height: 56px; background: var(--gray-100); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+        .empty-icon svg { width: 26px; height: 26px; fill: var(--gray-400); }
+        .empty-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--gray-700); margin-bottom: 6px; }
+        .empty-sub { font-size: 13px; color: var(--gray-400); font-weight: 300; }
+    </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <div class="header">
-    <a href="/dashboard" class="logo-container">
-        <img src="/images/logo.png" alt="KnowVault" class="logo-img">
+    <a href="/dashboard" class="header-logo">
+        <div class="logo-icon"><svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg></div>
+        <span class="logo-text">Know<span>Vault</span></span>
     </a>
-
-    <div class="search-container">
-        <form th:action="@{/history}" method="get" style="display:flex; width:100%;">
-            <span class="search-icon">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <input type="text"
-                   name="search"
-                   class="search-input"
-                   placeholder="Search history..."
-                   th:value="${search}">
-        </form>
-    </div>
-
-    <div class="header-actions">
-        <div class="user-avatar-container">
-            <div class="user-avatar" id="userAvatar">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="white"/>
-                    <path d="M12 14C6.47715 14 2 18.4772 2 24H22C22 18.4772 17.5228 14 12 14Z" fill="white" opacity="0.9"/>
-                </svg>
-                <span id="userInitials" th:text="${user != null ? user.username.substring(0,1).toUpperCase() : 'U'}">U</span>
+    <div class="avatar-wrap">
+        <div class="avatar" th:text="${user != null ? user.username.substring(0,1).toUpperCase() : 'U'}">U</div>
+        <div class="avatar-dropdown">
+            <div class="dropdown-header">
+                <div class="dropdown-name" th:text="${user != null ? user.username : 'User'}">User</div>
+                <div class="dropdown-email" th:text="${user != null ? user.email : ''}">user@email.com</div>
             </div>
+            <a href="/logout" class="dropdown-item danger">
+                <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+                Sign out
+            </a>
         </div>
-        <a href="/logout" class="btn-secondary" style="font-size:13px;">Logout</a>
     </div>
 </div>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-    <nav class="nav-section">
-        <a href="/dashboard" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                </svg>
-            </span>
-            <span>Home</span>
-        </a>
-
-        <a href="/documents" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>My Documents</span>
-        </a>
-
-        <a href="/history" class="nav-item active">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>History</span>
-        </a>
-
-        <a href="/ask" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>Ask AI</span>
-        </a>
-    </nav>
-
     <div class="nav-section">
-        <div class="nav-section-title">Quick Actions</div>
-        <a href="/documents/upload" class="nav-item">
-            <span class="nav-icon">
-                <svg viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                </svg>
-            </span>
-            <span>Upload Document</span>
-        </a>
+        <a href="/dashboard" class="nav-item"><svg viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>Home</a>
+        <a href="/documents" class="nav-item"><svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>My Documents</a>
+        <a href="/history" class="nav-item active"><svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>History</a>
+        <a href="/ask" class="nav-item"><svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/></svg>Ask AI</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Quick Actions</div>
+        <a href="/documents/upload" class="nav-item"><svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>Upload Document</a>
     </div>
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="main-content">
+<!-- MAIN -->
+<div class="main">
 
-    <!-- Page Header -->
     <div class="page-header">
         <div>
-            <h1 class="page-title">Query History</h1>
-            <p class="page-subtitle">
-                <span th:text="${totalQueries}">0</span> total queries recorded
-            </p>
+            <div class="page-title">Query History</div>
+            <div class="page-subtitle" th:text="${totalQueries + ' total queries recorded'}">0 total queries recorded</div>
         </div>
-
-        <!-- Clear all button — only show if there are entries -->
-        <form th:if="${historyEntries != null and !historyEntries.isEmpty()}"
-              th:action="@{/history/clear}"
-              method="post"
-              onsubmit="return confirm('Clear all history? This cannot be undone.');">
-            <button type="submit" class="btn-secondary" style="color: var(--danger); border-color: var(--danger);">
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                </svg>
+        <form th:action="@{/history/clear}" method="post" onsubmit="return confirm('Clear all history? This cannot be undone.')">
+            <button type="submit" class="btn-danger">
+                <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                 Clear All History
             </button>
         </form>
     </div>
 
-    <!-- Search filter bar -->
-    <div class="history-filters">
-        <form th:action="@{/history}" method="get" style="display:flex; gap: 12px; flex:1;">
-            <div class="filter-group" style="flex:1;">
-                <input type="text"
-                       name="search"
-                       class="filter-input"
-                       placeholder="Search in history..."
-                       th:value="${search}">
-            </div>
-            <button type="submit" class="btn-primary" style="padding: 8px 16px;">
-                Search
-            </button>
-            <a href="/history" class="btn-secondary" th:if="${search != null and !search.isBlank()}">
-                Clear
-            </a>
-        </form>
+    <!-- Search -->
+    <form class="search-row" method="get" th:action="@{/history}">
+        <div class="search-wrap">
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+            <input type="text" name="search" placeholder="Search in history..." th:value="${search}">
+        </div>
+        <button type="submit" class="btn-search">Search</button>
+    </form>
+
+    <!-- Empty state -->
+    <div class="empty-state" th:if="${#lists.isEmpty(historyEntries)}">
+        <div class="empty-icon">
+            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+        </div>
+        <div class="empty-title">No queries yet</div>
+        <div class="empty-sub">Your AI query history will appear here after you use Ask AI</div>
     </div>
 
-    <!-- Content card -->
-    <div class="content-card">
-
-        <!-- EMPTY STATE: no entries at all -->
-        <div class="empty-history"
-             th:if="${historyEntries == null or historyEntries.isEmpty()}">
-            <svg width="64" height="64" viewBox="0 0 20 20" fill="currentColor"
-                 style="opacity: 0.2; margin-bottom: 16px;">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-            </svg>
-
-            <!-- Different messages: no results vs no history at all -->
-            <th:block th:if="${search != null and !search.isBlank()}">
-                <h3 style="margin-bottom: 8px; color: var(--gray-700);">No results found</h3>
-                <p style="color: var(--gray-500); margin-bottom: 20px;">
-                    No queries match "<span th:text="${search}"></span>"
-                </p>
-                <a href="/history" class="btn-secondary">View all history</a>
-            </th:block>
-
-            <th:block th:unless="${search != null and !search.isBlank()}">
-                <h3 style="margin-bottom: 8px; color: var(--gray-700);">No history yet</h3>
-                <p style="color: var(--gray-500); margin-bottom: 20px;">
-                    Your AI query history will appear here
-                </p>
-                <a href="/ask" class="btn-primary">
-                    <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"/>
-                    </svg>
-                    Start Asking AI
-                </a>
-            </th:block>
-        </div>
-
-        <!-- HISTORY TIMELINE: real entries from DB -->
-        <div class="history-timeline"
-             th:if="${historyEntries != null and !historyEntries.isEmpty()}">
-
-            <div class="history-item" th:each="entry : ${historyEntries}">
-
-                <!-- Date badge -->
-                <div class="history-date">
-                    <span class="history-day" th:text="${entry.displayDay}">01</span>
-                    <span class="history-month" th:text="${entry.displayMonth}">Jan</span>
+    <!-- History list -->
+    <div class="history-list" th:if="${!#lists.isEmpty(historyEntries)}">
+        <div class="history-card" th:each="entry : ${historyEntries}">
+            <div class="history-card-header">
+                <div class="history-date-badge">
+                    <div class="history-date-day" th:text="${entry.getDisplayDay()}">1</div>
+                    <div class="history-date-month" th:text="${entry.getDisplayMonth()}">JAN</div>
                 </div>
-
-                <!-- Content -->
-                <div class="history-content">
-                    <div class="history-time" th:text="${entry.displayTime}">00:00</div>
-
-                    <div class="history-question">
-                        <strong>Q:</strong>
-                        <span th:text="${entry.queryText}">User question goes here</span>
-                    </div>
-
-                    <div class="history-answer">
-                        <strong>A:</strong>
-                        <span th:text="${entry.responsePreview}">AI response preview goes here...</span>
-                    </div>
-
-                    <!-- Execution time badge (optional) -->
-                    <div th:if="${entry.executionTimeMs != null}"
-                         style="font-size: 12px; color: var(--gray-400); margin-bottom: 10px;">
-                        Response time: <span th:text="${entry.executionTimeMs}">0</span> ms
-                    </div>
-
-                    <!-- Actions -->
-                    <div class="history-actions">
-                        <form th:action="@{/history/delete/{id}(id=${entry.queryId})}"
-                              method="post"
-                              onsubmit="return confirm('Delete this entry?');">
-                            <button type="submit"
-                                    class="history-action-btn history-delete-btn">
-                                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                                </svg>
-                                Delete
-                            </button>
-                        </form>
-                    </div>
+                <div class="history-meta">
+                    <div class="history-time" th:text="${entry.getDisplayTime()}">00:00</div>
+                    <div class="history-question" th:text="${entry.queryText}">Question</div>
                 </div>
             </div>
-
-        </div>
-        <!-- end history-timeline -->
-
-    </div>
-    <!-- end content-card -->
-
-</div>
-<!-- end main-content -->
-
-<!-- AI CHAT POPUP (placeholder, consistent with other pages) -->
-<button class="ai-chat-btn" onclick="toggleAIChat()">
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clip-rule="evenodd"/>
-    </svg>
-</button>
-
-<div class="ai-chat-popup" id="aiChatPopup">
-    <div class="chat-header">
-        <span>KnowVault Assist</span>
-        <button onclick="toggleAIChat()" style="background:none;border:none;color:white;cursor:pointer;font-size:18px;">×</button>
-    </div>
-    <div class="chat-messages" id="chatMessages">
-        <div class="chat-message ai">I'm KnowVault Assist. Ask me anything about your documents.</div>
-    </div>
-    <div class="chat-input-area">
-        <div class="chat-input-wrapper">
-            <input type="text" class="chat-input" placeholder="Ask me anything..." id="chatInput">
-            <button class="chat-send" onclick="sendMessage()">Send</button>
+            <div class="history-card-body">
+                <div class="history-answer-wrap">
+                    <div class="answer-accent"></div>
+                    <div class="answer-content">
+                        <div class="answer-label">Answer</div>
+                        <div class="answer-text"
+                             th:id="'answer-' + ${entry.queryId}"
+                             th:data-raw="${entry.responseText}">
+                        </div>
+                    </div>
+                </div>
+                <div class="history-footer">
+                    <span class="response-time"
+                          th:text="'Response time: ' + ${entry.responseTimeMs} + ' ms'">0 ms</span>
+                    <form th:action="@{'/history/delete/' + ${entry.queryId}}"
+                          method="post"
+                          onsubmit="return confirm('Delete this entry?')">
+                        <button type="submit" class="btn-delete">
+                            <svg viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
 
 <script>
-    function toggleAIChat() {
-        document.getElementById('aiChatPopup').classList.toggle('active');
-    }
-
-    function sendMessage() {
-        const input = document.getElementById('chatInput');
-        const container = document.getElementById('chatMessages');
-        if (!input.value.trim()) return;
-
-        const userMsg = document.createElement('div');
-        userMsg.className = 'chat-message user';
-        userMsg.textContent = input.value;
-        container.appendChild(userMsg);
-
-        setTimeout(() => {
-            const aiMsg = document.createElement('div');
-            aiMsg.className = 'chat-message ai';
-            aiMsg.textContent = 'Go to the Ask AI page for full AI queries.';
-            container.appendChild(aiMsg);
-            container.scrollTop = container.scrollHeight;
-        }, 400);
-
-        input.value = '';
-        container.scrollTop = container.scrollHeight;
-    }
-
-    document.getElementById('chatInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') sendMessage();
+    // Render markdown in all answer elements
+    document.querySelectorAll('.answer-text[data-raw]').forEach(el => {
+        const raw = el.getAttribute('data-raw');
+        if (raw) {
+            el.innerHTML = marked.parse(raw);
+        }
     });
 </script>
 
